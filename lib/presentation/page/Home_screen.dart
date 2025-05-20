@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green[700],
+        backgroundColor: Color(0xFF278550),
         elevation: 0,
         title: Row(
           children: [
@@ -134,116 +134,33 @@ class _HomeScreenState extends State<HomeScreen> {
             child:
                 userId == null
                     ? const Center(child: CircularProgressIndicator())
-                    : StreamBuilder<SiswaModel?>(
+                    : StreamBuilder<List<SiswaModel>>(
                       stream: PendaftaranService().getPendaftaranByUserId(
-                        "hRXdBiUg8yTcifDap9AvZ1QmrrM2",
+                        userId!,
                       ),
-
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return Center(child: CircularProgressIndicator());
                         }
 
-                        if (!snapshot.hasData || snapshot.data == null) {
-                          print("snapshot.data: ${snapshot.data}");
-                          print("snapshot.hasData: ${snapshot.hasData}");
+                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
                           return Center(
                             child: Text("Belum ada data pendaftaran."),
                           );
                         }
 
-                        final siswa = snapshot.data!;
-                        final status = siswa.status;
+                        final siswaList = snapshot.data!;
+                        print('siswaList: $siswaList');
 
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 40),
-                          width: 375,
-                          height: 151,
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(color: Colors.black26, blurRadius: 4),
-                            ],
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text('Berkas Di upload'),
-                                const SizedBox(height: 19),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text('Status'),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.crisis_alert_outlined,
-                                          color: Colors.green,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(status),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 19),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Berkas berhasil dilihat',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.yellow,
-                                        foregroundColor: Colors.black,
-                                      ),
-                                      child: const Text('Lihat Berkas'),
-                                    ),
-                                    const SizedBox(width: 19),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Berkas berhasil dihapus',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                        foregroundColor: Colors.white,
-                                      ),
-                                      child: const Text('Hapus Berkas'),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
+                        return ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: siswaList.length,
+                          itemBuilder: (context, index) {
+                            final siswa = siswaList[index];
+                            print('status: ${siswa.status}');
+                            return buildSiswaContainer(siswa);
+                          },
                         );
                       },
                     ),
@@ -257,12 +174,105 @@ class _HomeScreenState extends State<HomeScreen> {
         style: ElevatedButton.styleFrom(
           textStyle: const TextStyle(fontWeight: FontWeight.bold),
           maximumSize: Size(182, 79),
-          backgroundColor: Colors.green,
+          backgroundColor: Color(0xFF278550),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: Text(
           "Daftarkan Anak Anda",
           style: TextStyle(fontSize: 13, color: Colors.white),
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'list'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.drafts_outlined),
+            label: 'drafts',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildSiswaContainer(SiswaModel siswa) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 40),
+      width: 375,
+      height: 151,
+      decoration: BoxDecoration(
+        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Berkas Diupload',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 19),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Status'),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.crisis_alert_outlined,
+                      color: Colors.green,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(siswa.status ?? "-"),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 19),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Berkas berhasil dilihat',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.yellow,
+                    foregroundColor: Colors.black,
+                  ),
+                  child: const Text('Lihat Berkas'),
+                ),
+                const SizedBox(width: 19),
+                ElevatedButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Berkas berhasil dihapus',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Hapus Berkas'),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

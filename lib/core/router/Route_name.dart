@@ -7,4 +7,5 @@ class Routes {
   static const String forgot_password = '/forgot_password';
   static const String form = '/form';
   static const String formFiles = '/formFiles';
+  static const String editberkas = '/editberkas';
 }

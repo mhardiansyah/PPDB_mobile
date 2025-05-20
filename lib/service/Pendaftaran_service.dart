@@ -106,18 +106,32 @@ class PendaftaranService {
   //   }).toList();
   // });
 
-  Stream<SiswaModel?> getPendaftaranByUserId(String userId) {
-    return FirebaseFirestore.instance
-        .collection('pendaftaran')
-        .where("siswa.userid", isEqualTo: userId)
-        .snapshots()
-        .map((snapshot) {
-          if (snapshot.docs.isNotEmpty) {
-            final data = snapshot.docs.first.data();
-            return SiswaModel.fromJson(data['siswa']);
-          }
-          return null;
-        });
-  }
+  // Stream<SiswaModel?> getPendaftaranByUserId(String userId) {
+  //   return FirebaseFirestore.instance
+  //       .collection('pendaftaran')
+  //       .where("siswa.userid", isEqualTo: userId)
+  //       .snapshots()
+  //       .map((snapshot) {
+  //         if (snapshot.docs.isNotEmpty) {
+  //           final data = snapshot.docs.first.data();
+  //           return SiswaModel.fromJson(data['siswa']);
+  //         }
+  //         return null;
+  //       });
+  // }
+
+  Stream<List<SiswaModel>> getPendaftaranByUserId(String userId) {
+  return FirebaseFirestore.instance
+      .collection('pendaftaran')
+      .where("siswa.userid", isEqualTo: userId)
+      .snapshots()
+      .map((snapshot) {
+        return snapshot.docs.map((doc) {
+          final data = doc.data();
+          return SiswaModel.fromJson(data['siswa']);
+        }).toList();
+      });
+}
+
   
 }

@@ -5,6 +5,7 @@ import 'package:ppdb_be/presentation/form_files_screen.dart';
 import 'package:ppdb_be/presentation/page/Home_screen.dart';
 import 'package:ppdb_be/presentation/page/Login_screen.dart';
 import 'package:ppdb_be/presentation/page/Register_screen.dart';
+import 'package:ppdb_be/presentation/page/edit_berkas_screen.dart';
 
 part 'Route_name.dart';
 
@@ -28,6 +29,11 @@ final appRoute = [
     path: '/form',
     name: Routes.form,
     builder: (context, state) => const FormScreen(),
+  ),
+  GoRoute(
+    path: '/editberkas',
+    name: Routes.editberkas,
+    builder: (context, state) => const EditBerkasScreen(),
   ),
   GoRoute(
     path: '/formFiles',
