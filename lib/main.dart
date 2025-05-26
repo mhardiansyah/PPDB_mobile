@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           final GoRouter customRouter = GoRouter(
-            initialLocation: snapshot.data != null ? '/home' : '/login',
+            initialLocation: snapshot.data != null ? '/home' : '/splash',
             routes: appRoute,
           );
           return MaterialApp.router(

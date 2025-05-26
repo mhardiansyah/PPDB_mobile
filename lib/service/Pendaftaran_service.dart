@@ -12,12 +12,8 @@ import 'package:ppdb_be/widgets/notif_succes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PendaftaranService {
-  // final CollectionReference _pendaftaranColection = FirebaseFirestore.instance
-  //     .collection('berkas');
   final CollectionReference _pendaftaranCollection = FirebaseFirestore.instance
       .collection('pendaftaran');
-  // final CollectionReference , {required BerkasModel berkas}_collection =
-  // FirebaseFirestore.instance.collection('pendaftaran');
 
   Future addPendaftaran({
     required SiswaModel siswa,
@@ -31,12 +27,6 @@ class PendaftaranService {
       });
 
       final genaretId = docfref.id;
-
-      SuccessUploadWidget(key: const Key('success'));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pendaftaran berhasil ditambahkan')),
-      );
-      context.goNamed(Routes.home); // pastikan nama rute sesuai
     } catch (e) {
       print('Gagal menambahkan pendaftaran: $e');
       ScaffoldMessenger.of(
@@ -45,23 +35,64 @@ class PendaftaranService {
     }
   }
 
-  // Future addPendaftaran(
-  //   PendaftaranModel pendaftaranitems,
-  //   BuildContext context,
-  // ) async {
+  // Future editPendaftaran(BerkasModel berkasItems, BuildContext context) async {
   //   try {
-  //     print('jalan cuyy');
-  //     DocumentReference docref = await _pendaftaranColection.add(
-  //       pendaftaranitems.toJson(),
-  //     );
-  //     context.goNamed(Routes.home);
+  //     final docRef = FirebaseFirestore.instance
+  //         .collection('pendaftaran')
+  //         .doc(berkasItems.id);
+  //     await docRef.set({
+  //       'foto3x4Url': berkasItems.foto3x4Url,
+  //       'ijazahUrl': berkasItems.ijazahUrl,
+  //       'kartuKeluargaUrl': berkasItems.kartuKeluargaUrl,
+  //       'raporUrl': berkasItems.raporUrl,
+  //       'suratKeteranganLulusUrl': berkasItems.suratKeteranganLulusUrl,
+  //       'aktaKelahiranUrl': berkasItems.aktaKelahiranUrl,
+  //       'updatedAt': DateTime.now(),
+  //     }, SetOptions(merge: true));
   //   } catch (e) {
   //     ScaffoldMessenger.of(
   //       context,
-  //     ).showSnackBar(SnackBar(content: Text('data gagal ditambahkan')));
-  //     print('gagal cuyy: $e');
+  //     ).showSnackBar(SnackBar(content: Text('Gagal mengedit data: $e')));
   //   }
   // }
+
+
+Future updateBerkasBySiswaId(String siswaId, Map<String, dynamic> dataBerkas) async {
+  final _pendaftaranCollection = FirebaseFirestore.instance.collection('pendaftaran');
+
+  try {
+    // Query dokumen berdasarkan berkas.siswaId
+    final querySnapshot = await _pendaftaranCollection
+        .where('berkas.siswaId', isEqualTo: siswaId)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isEmpty) {
+      print('Dokumen dengan siswaId $siswaId tidak ditemukan.');
+      return;
+    }
+
+    // Ambil ID dokumen
+    final docId = querySnapshot.docs.first.id;
+
+    // Update field berkas
+    await _pendaftaranCollection.doc(docId).update({
+      'berkas.foto3x4Url': dataBerkas['foto3x4Url'],
+      'berkas.ijazahUrl': dataBerkas['ijazahUrl'],
+      'berkas.kartuKeluargaUrl': dataBerkas['kartuKeluargaUrl'],
+      'berkas.raporUrl': dataBerkas['raporUrl'],
+      'berkas.suratKeteranganLulusUrl': dataBerkas['suratKeteranganLulusUrl'],
+      'berkas.aktaKelahiranUrl': dataBerkas['aktaKelahiranUrl'],
+    });
+
+    print('Update berkas berhasil untuk siswaId $siswaId');
+  } catch (e) {
+    print('Gagal update berkas: $e');
+    rethrow;
+  }
+}
+
+
 
   Future addSiswa(SiswaModel siswa) async {
     final prefs = await SharedPreferences.getInstance();
@@ -70,68 +101,16 @@ class PendaftaranService {
     print('Siswa data saved: $siswaJson');
   }
 
-  //  Future addSiswaBerkas(
-  //   SiswaModel siswa,
-  //   BerkasModel berkas,
-  //   BuildContext context,
-  // ) async {
-  //   try {
-  //     // Gabungkan data ke dalam satu Map
-  //     final Map<String, dynamic> dataGabungan = {
-  //       'siswa': siswa.toJson(),
-  //       'berkas': berkas.toJson(),
-  //       'createdAt': Timestamp.now(),
-  //     };
-
-  //     await _collection.add(dataGabungan);
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Data berhasil ditambahkan")),
-  //     );
-
-  //     Navigator.pop(context); // atau redirect sesuai kebutuhan
-  //   } catch (e) {
-  //     print('Gagal menambahkan data: $e');
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Gagal menambahkan data")),
-  //     );
-  //   }
-  // }
-
-  // Stream<List<SiswaModel>> getPendaftaran() {
-  // return _pendaftaranCollection.snapshots().map((event) {
-  //   return event.docs.map((e) {
-  //     final data = e.data() as Map<String, dynamic>;
-  //     final siswaMap = data['siswa'] as Map<String, dynamic>;
-  //     return SiswaModel.fromJson(siswaMap);
-  //   }).toList();
-  // });
-
-  // Stream<SiswaModel?> getPendaftaranByUserId(String userId) {
-  //   return FirebaseFirestore.instance
-  //       .collection('pendaftaran')
-  //       .where("siswa.userid", isEqualTo: userId)
-  //       .snapshots()
-  //       .map((snapshot) {
-  //         if (snapshot.docs.isNotEmpty) {
-  //           final data = snapshot.docs.first.data();
-  //           return SiswaModel.fromJson(data['siswa']);
-  //         }
-  //         return null;
-  //       });
-  // }
-
   Stream<List<SiswaModel>> getPendaftaranByUserId(String userId) {
-  return FirebaseFirestore.instance
-      .collection('pendaftaran')
-      .where("siswa.userid", isEqualTo: userId)
-      .snapshots()
-      .map((snapshot) {
-        return snapshot.docs.map((doc) {
-          final data = doc.data();
-          return SiswaModel.fromJson(data['siswa']);
-        }).toList();
-      });
-}
-
-  
+    return FirebaseFirestore.instance
+        .collection('pendaftaran')
+        .where("siswa.userid", isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final data = doc.data();
+            return SiswaModel.fromJson(data['siswa']);
+          }).toList();
+        });
+  }
 }

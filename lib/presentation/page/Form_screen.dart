@@ -21,6 +21,10 @@ class _FormScreenState extends State<FormScreen> {
     'TEKNIK KOMPUTER DAN JARINGAN',
   ];
 
+  String? selectedJenisKelamin;
+
+  final List<String> jenisKelaminList = ['laki-laki', 'Perempuan'];
+
   // Controllers
   final TextEditingController namaSiswaController = TextEditingController();
   final TextEditingController asalSekolahController = TextEditingController();
@@ -32,7 +36,7 @@ class _FormScreenState extends State<FormScreen> {
   final TextEditingController noTelpController = TextEditingController();
   final TextEditingController alamatController = TextEditingController();
   final TextEditingController golDarahController = TextEditingController();
-  final TextEditingController jenisKelaminController = TextEditingController();
+  // final TextEditingController jenisKelaminController = TextEditingController();
   final TextEditingController provinsiController = TextEditingController();
   final TextEditingController domisiliController = TextEditingController();
   final TextEditingController kecamatanController = TextEditingController();
@@ -64,7 +68,7 @@ class _FormScreenState extends State<FormScreen> {
     domisiliController.dispose();
     kecamatanController.dispose();
     golDarahController.dispose();
-    jenisKelaminController.dispose();
+    // jenisKelaminController.dispose();
     super.dispose();
   }
 
@@ -232,9 +236,29 @@ class _FormScreenState extends State<FormScreen> {
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: TextFormField(
-                        controller: jenisKelaminController,
-                        decoration: _inputDecoration("Jenis Kelamin", "Pria"),
+                      child: DropdownButtonFormField<String>(
+                        value: selectedJenisKelamin,
+                        decoration: _inputDecoration(
+                          "Pilih Jenis Kelamin",
+                          "Pilih salah satu",
+                        ),
+                        items:
+                            jenisKelaminList
+                                .map(
+                                  (jenisKelamnin) => DropdownMenuItem(
+                                    value: jenisKelamnin,
+                                    child: Text(jenisKelamnin),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged:
+                            (value) =>
+                                setState(() => selectedJenisKelamin = value),
+                        validator:
+                            (value) =>
+                                value == null
+                                    ? 'Jenis kelamin harus dipilih'
+                                    : null,
                       ),
                     ),
                   ],
@@ -260,7 +284,8 @@ class _FormScreenState extends State<FormScreen> {
                         domisili: domisiliController.text,
                         kecamatan: kecamatanController.text,
                         golonganDarah: golDarahController.text,
-                        jenisKelamin: jenisKelaminController.text,
+                        // jenisKelamin: jenisKelaminController.text,
+                        jenisKelamin: selectedJenisKelamin ?? '',
                       );
 
                       await PendaftaranService().addSiswa(siswa);

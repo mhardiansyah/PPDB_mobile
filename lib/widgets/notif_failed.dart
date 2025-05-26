@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
 
-class SuccessUploadDialog extends StatelessWidget {
-  final String schoolName;
-
-  const SuccessUploadDialog({super.key, required this.schoolName});
+class NotifFailed extends StatelessWidget {
+  const NotifFailed({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,14 +17,15 @@ class SuccessUploadDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Lottie.asset(
-            'assets/animations/popup.json',
+            'assets/animations/failed.json',
             width: 250,
             height: 250,
-            repeat: false,
+            repeat: true,
+            
           ),
           const SizedBox(height: 16),
           Text(
-            "Berhasil Mengirim Berkas",
+            "Gagal Mengirim Berkas",
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -33,7 +33,7 @@ class SuccessUploadDialog extends StatelessWidget {
           ),
           const SizedBox(height: 25),
           Text(
-            "Berkas kamu telah terkirim ke $schoolName",
+            "Berkas kamu mungkin terlalu besar atau format tidak didukung.",
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -53,7 +53,7 @@ class SuccessUploadDialog extends StatelessWidget {
                 ),
               ),
               child: const Text(
-                "Kembali Ke Home",
+                "oke",
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,

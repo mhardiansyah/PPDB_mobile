@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker_web/image_picker_web.dart';
@@ -7,16 +8,20 @@ import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
 import 'package:ppdb_be/service/Pendaftaran_service.dart';
 import 'package:ppdb_be/service/upload_service.dart';
+import 'package:ppdb_be/widgets/notif_failed.dart';
+import 'package:ppdb_be/widgets/notif_succes.dart';
 
-class FormFilesScreen extends StatefulWidget {
-  final SiswaModel siswa;
-  const FormFilesScreen({super.key, required this.siswa});
+class EditFilesScreen extends StatefulWidget {
+  SiswaModel? siswa;
+
+  EditFilesScreen({Key? key, this.siswa}) : super(key: key);
 
   @override
-  State<FormFilesScreen> createState() => _FormFilesScreenState();
+  State<EditFilesScreen> createState() => _EditFilesScreenState();
 }
 
-class _FormFilesScreenState extends State<FormFilesScreen> {
+class _EditFilesScreenState extends State<EditFilesScreen> {
+  @override
   final _formKey = GlobalKey<FormState>();
   List<Uint8List?> selectedFiles = List.filled(6, null);
   List<String?> uploadedUrls = List.filled(6, null);
@@ -31,50 +36,6 @@ class _FormFilesScreenState extends State<FormFilesScreen> {
     }
   }
 
-  // Future _kirimBerkas() async {
-  //   if (!_formKey.currentState!.validate()) return;
-
-  //   setState(() => isLoading = true);
-
-  //   for (int i = 0; i < selectedFiles.length; i++) {
-  //     if (selectedFiles[i] != null) {
-  //       final url = await UploadService().uploadImage(selectedFiles[i]!);
-  //       uploadedUrls[i] = url;
-  //     }
-  //   }
-
-  // if (uploadedUrls.any((url) => url == null)) {
-  //   ScaffoldMessenger.of(
-  //     context,
-  //   ).showSnackBar(SnackBar(content: Text("Gagal upload salah satu berkas")));
-  //   setState(() => isLoading = false);
-  //   return;
-  // }
-
-  // if (uploadedUrls.isEmpty) {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  // }
-
-  //   final berkas = BerkasModel(
-  //     siswaId: widget.siswa.id.toString(),
-  //     foto3x4Url: uploadedUrls[0]!,
-  //     ijazahUrl: uploadedUrls[1]!,
-  //     kartuKeluargaUrl: uploadedUrls[2]!,
-  //     raporUrl: uploadedUrls[3]!,
-  //     suratKeteranganLulusUrl: uploadedUrls[4]!,
-  //     aktaKelahiranUrl: uploadedUrls[5]!,
-  //   );
-  //   await PendaftaranService().addPendaftaran(
-  //     siswa: widget.siswa,
-  //     berkas: berkas,
-  //     context: context,
-  //   );
-
-  //   setState(() => isLoading = false);
-  // }
-
   Future _kirimBerkas() async {
     setState(() => isLoading = true);
 
@@ -87,6 +48,7 @@ class _FormFilesScreenState extends State<FormFilesScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Gagal upload berkas ke-${i + 1}: $e")),
           );
+          showDialog(context: context, builder: (context) => NotifFailed());
           setState(() => isLoading = false);
           return;
         }
@@ -94,7 +56,7 @@ class _FormFilesScreenState extends State<FormFilesScreen> {
     }
 
     final berkas = BerkasModel(
-      siswaId: widget.siswa.id.toString(),
+      siswaId: widget.siswa?.id.toString(),
       foto3x4Url: uploadedUrls[0],
       ijazahUrl: uploadedUrls[1],
       kartuKeluargaUrl: uploadedUrls[2],
@@ -103,25 +65,25 @@ class _FormFilesScreenState extends State<FormFilesScreen> {
       aktaKelahiranUrl: uploadedUrls[5],
     );
 
-    await PendaftaranService().addPendaftaran(
-      siswa: widget.siswa,
-      berkas: berkas,
-      context: context,
+    await PendaftaranService().updateBerkasBySiswaId(
+      widget.siswa!.id.toString(),
+      berkas.toJson(),
     );
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Berkas berhasil dikirim")));
 
     setState(() {
       isLoading = false;
       selectedFiles = List.filled(6, null);
       uploadedUrls = List.filled(6, null);
-      widget.siswa.status = 'sedang diproses';
+      widget.siswa?.status = 'sedang diproses';
     });
+
+    showDialog(
+      context: context,
+      builder:
+          (context) => SuccessUploadDialog(schoolName: "SMK MADINATULQURAN"),
+    );
   }
 
-  @override
   Widget build(BuildContext context) {
     final fileLabels = [
       "Upload Foto 3x4",
@@ -131,13 +93,12 @@ class _FormFilesScreenState extends State<FormFilesScreen> {
       "Upload Surat Keterangan Lulus",
       "Upload Akta Kelahiran",
     ];
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF226D3D),
         title: const Text(
           "ISI BERKAS DATA DIRI SISWA",
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 16, color: Color(0xFFFFFFFF)),
         ),
         centerTitle: true,
         leading: BackButton(
@@ -193,7 +154,7 @@ class _FormFilesScreenState extends State<FormFilesScreen> {
                 ],
                 ElevatedButton(
                   onPressed: isLoading ? null : _kirimBerkas,
-                  
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF226D3D),
                     minimumSize: const Size(double.infinity, 50),
