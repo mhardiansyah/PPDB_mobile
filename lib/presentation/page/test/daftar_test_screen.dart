@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'test_mtk_screen.dart';
+import 'test_agama_screen.dart'; // Import screen agama
+import 'test_psikolog_screen.dart';
+import 'test_inggris_screen.dart';
 
 class DaftarTestScreen extends StatefulWidget {
   const DaftarTestScreen({super.key});
@@ -20,7 +24,7 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
       "image": "assets/images/mtk.png",
     },
     {
-      "title": "inggris",
+      "title": "bahasa inggris",
       "description": "Pengetahuan Inggris",
       "image": "assets/images/inggris.png",
     },
@@ -131,7 +135,7 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF278550),
+                                backgroundColor: const Color(0xFF278550),
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                   vertical: 8,
@@ -141,10 +145,55 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
                                 ),
                               ),
                               onPressed: () {
-                                // Navigate ke halaman tes 
-                                
+                                if (item["title"] == "Agama") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => const TestDiniahScreen(),
+                                    ),
+                                  );
+                                } else if (item["title"] == "matematika") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => const TestMtkScreen(),
+                                    ),
+                                  );
+                                } else if (item["title"] == "psikolog") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => TestpsikologScreen(),
+                                    ),
+                                  );
+                                } else if (item["title"] == "bahasa inggris") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => TestInggrisScreen(),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Halaman tes belum tersedia',
+                                      ),
+                                    ),
+                                  );
+                                }
                               },
-                              child: const Text("Mulai tes", style: TextStyle(fontSize: 12, color: Colors.white)),
+                              child: const Text(
+                                "Mulai tes",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ],
                         ),

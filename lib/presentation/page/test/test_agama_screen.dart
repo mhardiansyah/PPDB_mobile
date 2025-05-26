@@ -1,128 +1,149 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-class TestInggrisScreen extends StatefulWidget {
-  const TestInggrisScreen({Key? key}) : super(key: key);
+class TestDiniahScreen extends StatefulWidget {
+  const TestDiniahScreen({Key? key}) : super(key: key);
 
   @override
-  State<TestInggrisScreen> createState() => _TestInggrisScreenState();
+  State<TestDiniahScreen> createState() => _TestDiniahScreenState();
 }
 
-class _TestInggrisScreenState extends State<TestInggrisScreen> {
+class _TestDiniahScreenState extends State<TestDiniahScreen> {
   // Total waktu dalam detik (2 jam = 7200 detik)
   int remainingSeconds = 7200;
   Timer? _timer;
 
   final List<Map<String, dynamic>> questions = [
     {
-      'question': 'What is the English of "rumah"?',
-      'options': ['House', 'Home', 'Room', 'Apartment'],
+      'question': ' Rukun Islam yang pertama adalah...',
+      'options': ['Syahadat', 'Salat', 'Puasa', 'Haji'],
     },
     {
-      'question': 'What is the opposite of "hot"?',
-      'options': ['Cold', 'Warm', 'Cool', 'Chill'],
-    },
-    {
-      'question': 'What do you do when you meet someone in the morning?',
+      'question': ' Kitab suci umat Islam adalah...',
       'options': [
-        'Good Morning',
-        'Good Afternoon',
-        'Good Evening',
-        'Good Night',
-      ],
+        'Injil',
+        'Taurat',
+        'Al-Quran',
+        'Zabur',
+      ], // Disesuaikan urutan jika ada perbedaan
     },
     {
-      'question': 'What is the English of "anjing"?',
-      'options': ['Cat', 'Dog', 'Bird', 'Fish'],
+      'question': ' Nabi terakhir dalam Islam adalah...',
+      'options': ['Nabi Isa', 'Nabi Musa', 'Nabi Muhammad SAW', 'Nabi Daud'],
     },
     {
-      'question': 'Which one is an animal?',
-      'options': ['Chair', 'Table', 'Lion', 'Book'],
+      'question': ' Jumlah rakaat shalat Maghrib adalah...',
+      'options': ['2 rakaat', '3 rakaat', '4 rakaat', '5 rakaat'],
     },
     {
-      'question': 'What is the English for "kucing"?',
-      'options': ['Cat', 'Dog', 'Bird', 'Fish'],
-    },
-    {
-      'question': 'What is the opposite of "tall"?',
-      'options': ['Short', 'Long', 'Wide', 'Narrow'],
-    },
-    {
-      'question': 'How many colors in a rainbow?',
+      'question': ' Rukun Iman ada...',
       'options': ['5', '6', '7', '8'],
     },
     {
-      'question': 'What is the English of "apel"?',
-      'options': ['Orange', 'Banana', 'Apple', 'Grape'],
+      'question': ' Beriman kepada hari kiamat termasuk...',
+      'options': ['rukun islam', 'rukun iman', 'sunnah', 'adab'],
     },
     {
-      'question': 'How do you pronounce "Selamat Pagi" in English?',
-      'options': ['Good Morning', 'Good Afternoon', 'Good Evening', 'Hello'],
+      'question': ' Ibadah puasa wajib dikerjakan pada...',
+      'options': ['Syawal', 'Rajab', 'Ramadhan', 'Dzulhijjah'],
     },
     {
-      'question': 'What is the English of "mobil"?',
-      'options': ['Car', 'Bicycle', 'Motorcycle', 'Train'],
+      'question': ' Nama malaikat yang menyampaikan wahyu adalah...',
+      'options': ['israfil', 'malik', 'jibril', 'izrail'],
     },
     {
-      'question': 'Who cooks in the kitchen?',
-      'options': ['Student', 'Teacher', 'Doctor', 'Chef'],
-    },
-    {
-      'question': 'Which one is a fruit?',
-      'options': ['Tomato', 'Potato', 'Carrot', 'Apple'],
-    },
-    {
-      'question': 'What do you use to write?',
-      'options': ['Pencil', 'Chair', 'Table', 'Book'],
-    },
-    {
-      'question': 'What is the opposite of "open"?',
-      'options': ['Close', 'Start', 'Finish', 'Begin'],
-    },
-    {
-      'question': 'What are you doing with your eyes?',
-      'options': ['See', 'Hear', 'Smell', 'Taste'],
-    },
-    {
-      'question': 'What is the English of "minum"?',
-      'options': ['Eat', 'Drink', 'Sleep', 'Walk'],
-    },
-    {
-      'question': 'The English of "santai" is?',
-      'options': ['Relax', 'Work', 'Study', 'Read'],
-    },
-    {
-      'question': 'What is the English of "naga"?',
-      'options': ['Dragon', 'Snake', 'Lion', 'Tiger'],
-    },
-    {
-      'question': 'How do you say "selamat malam" in English?',
+      'question': ' Lafal syahadat yang benar adalah...',
       'options': [
-        'Good morning',
-        'Good afternoon',
-        'Good evening',
-        'Good night',
+        'Asyhadu an la ilaha illallah wa asyhadu anna Muhammadan rasulullah',
+        'Asyhadu allah',
+        'Subhanallah',
+        'Alhamdulillah',
       ],
     },
     {
-      'question': 'What is the English of "guru"?',
-      'options': ['Student', 'Teacher', 'Doctor', 'Pilot'],
+      'question': '. Shalat lima waktu hukumnya adalah...',
+      'options': ['Sunnah', 'Makruh', 'Wajib', 'Mubah'],
     },
     {
-      'question': 'What is the opposite of "clean"?',
-      'options': ['Dirty', 'Neat', 'Tidy', 'Pure'],
+      'question':
+          ' Nabi yang mendapat mukjizat bisa membelah bulan adalah...',
+      'options': ['Nabi Isa', 'Nabi Musa', 'Nabi Muhammad', 'Nabi Yusuf'],
     },
     {
-      'question': 'What is the English of "makan"?',
-      'options': ['Drink', 'Eat', 'Sleep', 'Walk'],
+      'question': ' Orang yang tidak mau membayar zakat disebut...',
+      'options': [
+        'Murtad',
+        'Musyrik',
+        'Kafir',
+        'Munafik',
+      ], // Pilihan "-" pada gambar tidak relevan
     },
     {
-      'question': 'What do you use to hear?',
-      'options': ['Eyes', 'Ears', 'Nose', 'Mouth'],
+      'question': ' Kitab Injil diturunkan di kota...',
+      'options': ['Madinah', 'Mekkah', 'Yerusalem', 'Baitul Maqdis'],
     },
     {
-      'question': 'What is "senyum"?',
-      'options': ['Cry', 'Laugh', 'Smile', 'Frown'],
+      'question': ' Kitab Injil diturunkan kepada Nabi Isa adalah...',
+      'options': ['Zabur', 'Taurat', 'Injil', 'Al-Quran'],
+    },
+    {
+      'question': ' Jumlah rakaat shalat Subuh adalah...',
+      'options': ['2 rakaat', '3 rakaat', '4 rakaat', '5 rakaat'],
+    },
+    {
+      'question': 'Nabi yang bisa berbicara sejak bayi adalah...',
+      'options': ['Nabi Yusuf', 'Nabi Isa', 'Nabi Musa', 'Nabi Ibrahim'],
+    },
+    {
+      'question': 'Puasa dilakukan sejak...',
+      'options': [
+        'Terbit matahari hingga terbenam',
+        'Terbit fajar hingga terbenam matahari',
+        'Terbit fajar hingga terbit matahari',
+        'Terbit terbit hingga terbenam matahari',
+      ],
+    },
+    {
+      'question': 'Toleransi antar umat beragama disebut...',
+      'options': ['Syirik', 'Khilafah', 'Tasawuf', 'Tasamu'],
+    },
+    {
+      'question': 'Salat yang dikerjakan dua kali setahun adalah...',
+      'options': [
+        'Salat Jumat',
+        'Salat Tarawih',
+        'Salat Idul Fitri',
+        'Salat Tahajud',
+      ],
+    },
+    {
+      'question': 'Allah SWT memiliki sifat Maha Melihat, disebut...',
+      'options': ['Al-Qawiy', 'Al-Alim', 'Al-Bashir', 'Al-Razzaq'],
+    },
+    {
+      'question': 'Membaca Al-Qur\'an mendapat...',
+      'options': ['Pahala', 'Hukuman', 'Dosa', 'Ujian'],
+    },
+    {
+      'question': 'Jumlah juz dalam Al-Qur\'an adalah...',
+      'options': ['25', '30', '35', '40'],
+    },
+    {
+      'question': 'Umat Islam menghadap ke arah...',
+      'options': ['Barat', 'Selatan', 'Timur', 'Makkah'],
+    },
+    {
+      'question': 'Wajib dikerjakan sebelum...',
+      'options': ['Puasa', 'Salat', 'Haji', 'Zakat'],
+    },
+    {
+      'question': 'Orang yang berpuasa tapi tidak shalat...',
+      'options': [
+        'Diampuni dosanya',
+        'Diampuni',
+        'Diterima puasanya',
+        'Tidak Berdosa',
+      ],
     },
   ];
 
@@ -208,7 +229,7 @@ class _TestInggrisScreenState extends State<TestInggrisScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
-                        'bahasa inggris',
+                        'Agama',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),

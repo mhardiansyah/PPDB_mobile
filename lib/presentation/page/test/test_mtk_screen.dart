@@ -1,128 +1,122 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-class TestInggrisScreen extends StatefulWidget {
-  const TestInggrisScreen({Key? key}) : super(key: key);
+class TestMtkScreen extends StatefulWidget {
+  const TestMtkScreen({Key? key}) : super(key: key);
 
   @override
-  State<TestInggrisScreen> createState() => _TestInggrisScreenState();
+  State<TestMtkScreen> createState() => _TestMtkScreenState();
 }
 
-class _TestInggrisScreenState extends State<TestInggrisScreen> {
+class _TestMtkScreenState extends State<TestMtkScreen> {
   // Total waktu dalam detik (2 jam = 7200 detik)
   int remainingSeconds = 7200;
   Timer? _timer;
 
   final List<Map<String, dynamic>> questions = [
     {
-      'question': 'What is the English of "rumah"?',
-      'options': ['House', 'Home', 'Room', 'Apartment'],
+      'question': 'Hasil dari 8 + 13 adalah...',
+      'options': ['18', '20', '21', '15'],
     },
     {
-      'question': 'What is the opposite of "hot"?',
-      'options': ['Cold', 'Warm', 'Cool', 'Chill'],
+      'question': 'Kelompok prima terkecil adalah...',
+      'options': ['0', '1', '2', '4'],
     },
     {
-      'question': 'What do you do when you meet someone in the morning?',
-      'options': [
-        'Good Morning',
-        'Good Afternoon',
-        'Good Evening',
-        'Good Night',
-      ],
+      'question': 'FPB dari 12 dan 18 adalah...',
+      'options': ['2', '4', '6', '12'],
     },
     {
-      'question': 'What is the English of "anjing"?',
-      'options': ['Cat', 'Dog', 'Bird', 'Fish'],
+      'question': 'KPK dari 4 dan 6 adalah...',
+      'options': ['18', '12', '36', '24'],
     },
     {
-      'question': 'Which one is an animal?',
-      'options': ['Chair', 'Table', 'Lion', 'Book'],
+      'question': '6 + 6 = ...',
+      'options': ['6', '8', '5', '7'],
     },
     {
-      'question': 'What is the English for "kucing"?',
-      'options': ['Cat', 'Dog', 'Bird', 'Fish'],
+      'question': '0,25 jika diubah ke bentuk pecahan adalah...',
+      'options': ['1/2', '1/4', '1/8', '2/5'],
     },
     {
-      'question': 'What is the opposite of "tall"?',
-      'options': ['Short', 'Long', 'Wide', 'Narrow'],
+      'question': 'Akar kuadrat dari 81 adalah...',
+      'options': ['7', '8', '9', '5'],
     },
     {
-      'question': 'How many colors in a rainbow?',
-      'options': ['5', '6', '7', '8'],
+      'question': '2 x 9 = ...',
+      'options': ['8', '16', '18', '12'],
     },
     {
-      'question': 'What is the English of "apel"?',
-      'options': ['Orange', 'Banana', 'Apple', 'Grape'],
+      'question': 'Hasil dari 10% dari 200 adalah...',
+      'options': ['20', '30', '40', '50'],
     },
     {
-      'question': 'How do you pronounce "Selamat Pagi" in English?',
-      'options': ['Good Morning', 'Good Afternoon', 'Good Evening', 'Hello'],
+      'question': 'Hasil dari 10% dari 200 ...',
+      'options': ['10 ', '20', '30', '40'],
     },
     {
-      'question': 'What is the English of "mobil"?',
-      'options': ['Car', 'Bicycle', 'Motorcycle', 'Train'],
+      'question': ' Hasil dari 13 + 7 adalah...',
+      'options': ['14', '17', '20', '19'],
     },
     {
-      'question': 'Who cooks in the kitchen?',
-      'options': ['Student', 'Teacher', 'Doctor', 'Chef'],
+      'question': ' Pecahan 2 mewakili dari 3 = 1 adalah...',
+      'options': ['1/7', '2/3', '1/3', '3/8'],
     },
     {
-      'question': 'Which one is a fruit?',
-      'options': ['Tomato', 'Potato', 'Carrot', 'Apple'],
+      'question': ' 2,5 + 3,5 = ...',
+      'options': ['5', '6', '6,5', '7'],
     },
     {
-      'question': 'What do you use to write?',
-      'options': ['Pencil', 'Chair', 'Table', 'Book'],
+      'question': ' 6 + 6 : 2 = ...',
+      'options': ['3', '6', '9', '12'],
     },
     {
-      'question': 'What is the opposite of "open"?',
-      'options': ['Close', 'Start', 'Finish', 'Begin'],
+      'question': ' 0,06 dalam bentuk persen adalah...',
+      'options': ['0,06%', '6%', '0,6%', '70,5%'],
     },
     {
-      'question': 'What are you doing with your eyes?',
-      'options': ['See', 'Hear', 'Smell', 'Taste'],
+      'question':
+          ' Sebuah segitiga mempunyai alas 40 cm dan tinggi 6 cm. Luasnya adalah...',
+      'options': ['60 cm²', '120 cm²', '240 cm²', '600 cm²'],
     },
     {
-      'question': 'What is the English of "minum"?',
-      'options': ['Eat', 'Drink', 'Sleep', 'Walk'],
+      'question':
+          ' Jika sebuah persegi panjang panjangnya 10 cm dan lebarnya 4 cm, maka luasnya adalah...',
+      'options': ['40 cm²', '14 cm²', '24 cm²', '50 cm²'],
     },
     {
-      'question': 'The English of "santai" is?',
-      'options': ['Relax', 'Work', 'Study', 'Read'],
+      'question': ' 3 jam berapa menit = ...',
+      'options': ['90', '100', '120', '180'],
     },
     {
-      'question': 'What is the English of "naga"?',
-      'options': ['Dragon', 'Snake', 'Lion', 'Tiger'],
+      'question': ' Hasil dari 5² adalah...',
+      'options': ['7', '8', '10', '25'],
     },
     {
-      'question': 'How do you say "selamat malam" in English?',
-      'options': [
-        'Good morning',
-        'Good afternoon',
-        'Good evening',
-        'Good night',
-      ],
+      'question': ' Hasil dari 10% dari 200 ...',
+      'options': ['10', '20', '30', '40'],
     },
     {
-      'question': 'What is the English of "guru"?',
-      'options': ['Student', 'Teacher', 'Doctor', 'Pilot'],
+      'question':
+          ' Keliling segitiga dengan panjang sisi 5 cm, 6 cm, dan 7 cm adalah...',
+      'options': ['18 cm', '17 cm', '19 cm', '16 cm'],
     },
     {
-      'question': 'What is the opposite of "clean"?',
-      'options': ['Dirty', 'Neat', 'Tidy', 'Pure'],
+      'question': ' Volume kubus dengan sisi 3 cm adalah...',
+      'options': ['6 cm³', '18 cm³', '9 cm³', '27 cm³'],
     },
     {
-      'question': 'What is the English of "makan"?',
-      'options': ['Drink', 'Eat', 'Sleep', 'Walk'],
+      'question':
+          ' Jika suhu di kulkas -5°C lalu naik 3°C, maka suhunya sekarang...',
+      'options': ['-8°C', '-2°C', '-10°C', '0°C'],
     },
     {
-      'question': 'What do you use to hear?',
-      'options': ['Eyes', 'Ears', 'Nose', 'Mouth'],
+      'question': ' 100 : (5 × 2) = ...',
+      'options': ['10', '100', '5', '15'],
     },
     {
-      'question': 'What is "senyum"?',
-      'options': ['Cry', 'Laugh', 'Smile', 'Frown'],
+      'question': ' Volume kubus dengan sisi 3 cm adalah...',
+      'options': ['6 cm³', '18 cm³', '9 cm³', '27 cm³'],
     },
   ];
 
@@ -208,7 +202,7 @@ class _TestInggrisScreenState extends State<TestInggrisScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
-                        'bahasa inggris',
+                        'matematika',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),

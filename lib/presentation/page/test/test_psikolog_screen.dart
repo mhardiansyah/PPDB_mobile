@@ -1,128 +1,382 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-class TestInggrisScreen extends StatefulWidget {
-  const TestInggrisScreen({Key? key}) : super(key: key);
+class TestpsikologScreen extends StatefulWidget {
+  const TestpsikologScreen({Key? key}) : super(key: key);
 
   @override
-  State<TestInggrisScreen> createState() => _TestInggrisScreenState();
+  State<TestpsikologScreen> createState() => _TestpsikologScreenState();
 }
 
-class _TestInggrisScreenState extends State<TestInggrisScreen> {
+class _TestpsikologScreenState extends State<TestpsikologScreen> {
   // Total waktu dalam detik (2 jam = 7200 detik)
   int remainingSeconds = 7200;
   Timer? _timer;
 
   final List<Map<String, dynamic>> questions = [
     {
-      'question': 'What is the English of "rumah"?',
-      'options': ['House', 'Home', 'Room', 'Apartment'],
-    },
-    {
-      'question': 'What is the opposite of "hot"?',
-      'options': ['Cold', 'Warm', 'Cool', 'Chill'],
-    },
-    {
-      'question': 'What do you do when you meet someone in the morning?',
+      'question': 'Saat menerima sebuah email, kemungkinan besar saya akan...',
+
       'options': [
-        'Good Morning',
-        'Good Afternoon',
-        'Good Evening',
-        'Good Night',
+        'Segera membaca dan membalasnya',
+
+        'Menundanya sampai ada waktu luang',
+
+        'Membacanya nanti saja',
+
+        'Langsung menghapusnya',
       ],
     },
+
     {
-      'question': 'What is the English of "anjing"?',
-      'options': ['Cat', 'Dog', 'Bird', 'Fish'],
-    },
-    {
-      'question': 'Which one is an animal?',
-      'options': ['Chair', 'Table', 'Lion', 'Book'],
-    },
-    {
-      'question': 'What is the English for "kucing"?',
-      'options': ['Cat', 'Dog', 'Bird', 'Fish'],
-    },
-    {
-      'question': 'What is the opposite of "tall"?',
-      'options': ['Short', 'Long', 'Wide', 'Narrow'],
-    },
-    {
-      'question': 'How many colors in a rainbow?',
-      'options': ['5', '6', '7', '8'],
-    },
-    {
-      'question': 'What is the English of "apel"?',
-      'options': ['Orange', 'Banana', 'Apple', 'Grape'],
-    },
-    {
-      'question': 'How do you pronounce "Selamat Pagi" in English?',
-      'options': ['Good Morning', 'Good Afternoon', 'Good Evening', 'Hello'],
-    },
-    {
-      'question': 'What is the English of "mobil"?',
-      'options': ['Car', 'Bicycle', 'Motorcycle', 'Train'],
-    },
-    {
-      'question': 'Who cooks in the kitchen?',
-      'options': ['Student', 'Teacher', 'Doctor', 'Chef'],
-    },
-    {
-      'question': 'Which one is a fruit?',
-      'options': ['Tomato', 'Potato', 'Carrot', 'Apple'],
-    },
-    {
-      'question': 'What do you use to write?',
-      'options': ['Pencil', 'Chair', 'Table', 'Book'],
-    },
-    {
-      'question': 'What is the opposite of "open"?',
-      'options': ['Close', 'Start', 'Finish', 'Begin'],
-    },
-    {
-      'question': 'What are you doing with your eyes?',
-      'options': ['See', 'Hear', 'Smell', 'Taste'],
-    },
-    {
-      'question': 'What is the English of "minum"?',
-      'options': ['Eat', 'Drink', 'Sleep', 'Walk'],
-    },
-    {
-      'question': 'The English of "santai" is?',
-      'options': ['Relax', 'Work', 'Study', 'Read'],
-    },
-    {
-      'question': 'What is the English of "naga"?',
-      'options': ['Dragon', 'Snake', 'Lion', 'Tiger'],
-    },
-    {
-      'question': 'How do you say "selamat malam" in English?',
+      'question': 'Jika ada tugas kelompok, saya biasanya...',
+
       'options': [
-        'Good morning',
-        'Good afternoon',
-        'Good evening',
-        'Good night',
+        'Mengambil alih kepemimpinan',
+
+        'Berpartisipasi aktif dalam diskusi',
+
+        'Cenderung diam dan menunggu instruksi',
+
+        'Menyumbangkan ide-ide saja',
       ],
     },
+
     {
-      'question': 'What is the English of "guru"?',
-      'options': ['Student', 'Teacher', 'Doctor', 'Pilot'],
+      'question': 'Saat berinteraksi dengan orang lain, saya...',
+
+      'options': [
+        'Cenderung memulai pembicaraan',
+
+        'Menunggu dia berbicara terlebih dahulu',
+
+        'Hanya berbicara jika ditanya',
+
+        'Tidak peduli',
+      ],
     },
+
     {
-      'question': 'What is the opposite of "clean"?',
-      'options': ['Dirty', 'Neat', 'Tidy', 'Pure'],
+      'question': 'Kalau ada konflik atau masalah, saya...',
+
+      'options': [
+        'Mencari solusi secepatnya',
+
+        'Menghindari konfrontasi',
+
+        'Menunggu orang lain menyelesaikannya',
+
+        'Menyalahkan orang lain',
+      ],
     },
+
     {
-      'question': 'What is the English of "makan"?',
-      'options': ['Drink', 'Eat', 'Sleep', 'Walk'],
+      'question': 'Saat mengambil sebuah keputusan, saya...',
+
+      'options': [
+        'Cenderung terburu-buru',
+
+        'Mempertimbangkan semua pilihan dengan matang',
+
+        'Mengikuti intuisi',
+
+        'Meminta orang lain memutuskan',
+      ],
     },
+
     {
-      'question': 'What do you use to hear?',
-      'options': ['Eyes', 'Ears', 'Nose', 'Mouth'],
+      'question': 'Saat menghadapi sebuah masalah baru, saya...',
+
+      'options': [
+        'Langsung cari solusi',
+
+        'Menganalisis situasi secara mendalam',
+
+        'Menyerah begitu saja',
+
+        'Meminta bantuan orang lain',
+      ],
     },
+
     {
-      'question': 'What is "senyum"?',
-      'options': ['Cry', 'Laugh', 'Smile', 'Frown'],
+      'question': 'Saya lebih suka bekerja...',
+
+      'options': [
+        'Sendirian',
+
+        'Dalam tim kecil',
+
+        'Dalam tim besar',
+
+        'Tidak peduli dengan siapa saya bekerja',
+      ],
+    },
+
+    {
+      'question': 'Dalam lingkungan kerja, saya lebih suka...',
+
+      'options': [
+        'Pekerjaan yang terstruktur dan teratur',
+
+        'Pekerjaan yang dinamis dan bervariasi',
+
+        'Pekerjaan yang monoton',
+
+        'Pekerjaan yang tidak terstruktur',
+      ],
+    },
+
+    {
+      'question': 'Saat merasa stres, saya cenderung...',
+
+      'options': [
+        'Mencari cara untuk mengelola stres',
+
+        'Menyendiri',
+
+        'Makan berlebihan',
+
+        'Menangis',
+      ],
+    },
+
+    {
+      'question': 'Dalam membuat keputusan pribadi, saya...',
+
+      'options': [
+        'Meminta saran orang lain',
+
+        'Memutuskan sendiri',
+
+        'Menunda keputusan',
+
+        'Tidak tahu harus berbuat apa',
+      ],
+    },
+
+    {
+      'question': 'Ketika menghadapi situasi baru, saya...',
+
+      'options': [
+        'Antusias dan cepat beradaptasi',
+
+        'Cenderung hati-hati dan membutuhkan waktu untuk beradaptasi',
+
+        'Merasa cemas',
+
+        'Menghindari situasi baru',
+      ],
+    },
+
+    {
+      'question': 'Jika ada perubahan rencana, saya...',
+
+      'options': [
+        'Menerimanya dengan fleksibel',
+
+        'Merasa frustasi',
+
+        'Menolak perubahan',
+
+        'Tidak peduli',
+      ],
+    },
+
+    {
+      'question': 'Saya lebih suka...',
+
+      'options': [
+        'Membaca buku',
+
+        'Menonton film',
+
+        'Mendengarkan musik',
+
+        'Berinteraksi sosial',
+      ],
+    },
+
+    {
+      'question': 'Saat menghadapi sebuah tantangan, saya...',
+
+      'options': [
+        'Termotivasi untuk mengatasinya',
+
+        'Merasa terbebani',
+
+        'Menyerah begitu saja',
+
+        'Mengabaikannya',
+      ],
+    },
+
+    {
+      'question': 'Saat diberi kritik, saya...',
+
+      'options': [
+        'Menerimanya dengan terbuka',
+
+        'Merasa tersinggung',
+
+        'Menolak kritik',
+
+        'Tidak peduli',
+      ],
+    },
+
+    {
+      'question': 'Saya merasa puas jika...',
+
+      'options': [
+        'Mampu mencapai tujuan',
+
+        'Mendapat pujian',
+
+        'Tidak melakukan kesalahan',
+
+        'Menyelesaikan tugas dengan cepat',
+      ],
+    },
+
+    {
+      'question': 'Dalam belajar, saya lebih suka...',
+
+      'options': [
+        'Mencari tahu sendiri',
+
+        'Diajari oleh orang lain',
+
+        'Belajar secara mandiri',
+
+        'Belajar bersama teman',
+      ],
+    },
+
+    {
+      'question': 'Saat ada konflik, saya...',
+
+      'options': [
+        'Mencari penyelesaian yang adil',
+
+        'Menghindari konflik',
+
+        'Meninggalkan situasi tersebut',
+
+        'Mencari dukungan dari orang lain',
+      ],
+    },
+
+    {
+      'question': 'Saya lebih suka menghabiskan waktu luang dengan...',
+
+      'options': [
+        'Aktivitas yang menantang',
+
+        'Bersantai di rumah',
+
+        'Bersosialisasi',
+
+        'Tidur',
+      ],
+    },
+
+    {
+      'question': 'Ketika ada perubahan di tempat kerja, saya...',
+
+      'options': [
+        'Menyesuaikan diri dengan cepat',
+
+        'Merasa tidak nyaman',
+
+        'Menolak perubahan',
+
+        'Mengeluh',
+      ],
+    },
+
+    {
+      'question': 'Apakah Anda suka menjadi pusat perhatian?',
+
+      'options': [
+        'Ya, sangat suka',
+
+        'Terkadang',
+
+        'Tidak terlalu suka',
+
+        'Tidak suka sama sekali',
+      ],
+    },
+
+    {
+      'question': 'Dalam mengambil keputusan, Anda cenderung...',
+
+      'options': [
+        'Analitis dan logis',
+
+        'Emosional',
+
+        'Intuisi',
+
+        'Mengikuti orang lain',
+      ],
+    },
+
+    {
+      'question': 'Saat berhadapan dengan kegagalan, Anda...',
+
+      'options': [
+        'Belajar dari kesalahan dan bangkit lagi',
+
+        'Merasa sangat kecewa',
+
+        'Menyalahkan diri sendiri',
+
+        'Menyerah',
+      ],
+    },
+
+    {
+      'question': 'Bagaimana Anda mengatasi tekanan?',
+
+      'options': [
+        'Tetap tenang dan fokus',
+
+        'Merasa panik dan cemas',
+
+        'Menghindari situasi yang menekan',
+
+        'Mencari bantuan dari orang lain',
+      ],
+    },
+
+    {
+      'question': 'Ketika Anda merasa tidak termotivasi, Anda...',
+
+      'options': [
+        'Mencari inspirasi dan tujuan baru',
+
+        'Menyerah pada perasaan itu',
+
+        'Mengeluh',
+
+        'Tidur panjang',
+      ],
+    },
+
+    {
+      'question':
+          'Bagaimana Anda berinteraksi dengan orang yang tidak Anda kenal?',
+
+      'options': [
+        'Membuka diri dan mencoba berkenalan',
+
+        'Cenderung pendiam dan menjaga jarak',
+
+        'Merasa canggung',
+
+        'Tidak peduli',
+      ],
     },
   ];
 
@@ -208,7 +462,7 @@ class _TestInggrisScreenState extends State<TestInggrisScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
-                        'bahasa inggris',
+                        'psikolog',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
