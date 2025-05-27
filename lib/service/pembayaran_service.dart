@@ -1,0 +1,89 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'package:ppdb_be/core/models/pembayaran_model.dart';
+
+class PembayaranService {
+  final _pembayaranCollection = FirebaseFirestore.instance.collection(
+    'pembayaran_siswa',
+  );
+
+  Future<String?> uploadBuktiPembayaran(Uint8List imageBytes) async {
+    try {
+      Uri url = Uri.parse(
+        'https://api.cloudinary.com/v1_1/dulun20eo/image/upload',
+      );
+
+      var request =
+          http.MultipartRequest('POST', url)
+            ..fields['upload_preset'] = 'simple_app_preset'
+            ..files.add(
+              http.MultipartFile.fromBytes(
+                'file',
+                imageBytes,
+                filename: 'bukti.jpg',
+              ),
+            );
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        var responseData = await response.stream.bytesToString();
+        var jsonResult = jsonDecode(responseData);
+        return jsonResult['secure_url'];
+      } else {
+        print('Upload gagal: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception saat upload: $e');
+      return null;
+    }
+  }
+
+  Future tambahPembayaran({
+  required String siswaId,
+  required String metodePembayaran,
+  required int jumlah,
+  Uint8List? buktiBayarBytes,
+}) async {
+  try {
+    String? buktiPembayaranUrl;
+
+    if (buktiBayarBytes != null) {
+      buktiPembayaranUrl = await uploadBuktiPembayaran(buktiBayarBytes);
+    }
+
+    final pembayaran = PembayaranModel(
+      siswaId: siswaId,
+      buktiPembayaranUrl: buktiPembayaranUrl,
+      tanggalPembayaran: DateTime.now(),
+      status: 'sudah bayar',
+    );
+
+    await _pembayaranCollection.add(pembayaran.toJson());
+    print("Pembayaran berhasil ditambahkan");
+  } catch (e) {
+    print("Error tambah pembayaran: $e");
+  }
+}
+
+
+  Stream<String> statusPembayaranStream(String siswaId) {
+    return FirebaseFirestore.instance
+        .collection('pembayaran_siswa')
+        .where('siswaId', isEqualTo: siswaId)
+        .orderBy('tanggalPembayaran', descending: true)
+        .limit(1)
+        .snapshots()
+        .map((snapshot) {
+          if (snapshot.docs.isNotEmpty) {
+            final data = snapshot.docs.first.data();
+            return (data['status'] ?? 'belum bayar') as String;
+          }
+          return 'belum bayar';
+        });
+  }
+}

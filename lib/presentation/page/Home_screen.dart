@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+import 'package:ppdb_be/core/models/pembayaran_model.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
 import 'package:ppdb_be/service/Pendaftaran_service.dart';
 import 'package:ppdb_be/service/auth_service.dart';
+import 'package:ppdb_be/service/pembayaran_service.dart';
 import 'package:ppdb_be/widgets/SiswaCard.dart';
 import 'package:ppdb_be/widgets/berkas.dart';
 import 'package:ppdb_be/widgets/notif_failed.dart';
@@ -23,6 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   String? userId;
   bool isSudahDaftar = false;
+  bool isSudahcomplete = false;
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (user != null) {
       userId = user.uid;
       cekPendaftaran(user.uid);
+      cekberkas(user.uid);
     }
   }
 
@@ -40,6 +45,36 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         isSudahDaftar = firstData.isNotEmpty;
       });
+    }
+  }
+
+  void cekberkas(String uid) async {
+    final stream = PendaftaranService().getBerkasByUserId(uid);
+    final firstData = await stream.first;
+
+    if (mounted) {
+      if (firstData.isNotEmpty) {
+        final berkas = firstData[0]; // Ambil dokumen pertama saja
+        setState(() {
+          isSudahcomplete =
+              berkas.foto3x4Url != null &&
+              berkas.foto3x4Url!.isNotEmpty &&
+              berkas.ijazahUrl != null &&
+              berkas.ijazahUrl!.isNotEmpty &&
+              berkas.kartuKeluargaUrl != null &&
+              berkas.kartuKeluargaUrl!.isNotEmpty &&
+              berkas.raporUrl != null &&
+              berkas.raporUrl!.isNotEmpty &&
+              berkas.suratKeteranganLulusUrl != null &&
+              berkas.suratKeteranganLulusUrl!.isNotEmpty &&
+              berkas.aktaKelahiranUrl != null &&
+              berkas.aktaKelahiranUrl!.isNotEmpty;
+        });
+      } else {
+        setState(() {
+          isSudahcomplete = false;
+        });
+      }
     }
   }
 
@@ -208,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       snapshot.data!.isEmpty) {
                                     return const Center(
                                       child: Text(
-                                        "Belum ada data pendaftaran.",
+                                        "kamu belum mendaftar di PPDB ini",
                                       ),
                                     );
                                   }
@@ -235,12 +270,92 @@ class _HomeScreenState extends State<HomeScreen> {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Color(0xFF1B884B), // Hijau
+                                  color: Color(0xFF1B884B),
                                   borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Color(0xFFFFFFFF),
+                                    width: 2,
+                                  ),
                                 ),
                                 child: Center(
                                   child: Text(
-                                    "Program",
+                                    "Pengumuman",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+                            Center(child: buildPengumumanContainer(context,)),
+                            const SizedBox(height: 20),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed:
+                                    isSudahDaftar && isSudahcomplete
+                                        ? () {
+                                          context.goNamed(Routes.daftar_test);
+                                        }
+                                        : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      isSudahDaftar && isSudahcomplete
+                                          ? Color(0xFFFFA500)
+                                          : const Color.fromARGB(
+                                            255,
+                                            72,
+                                            68,
+                                            68,
+                                          ),
+                                  foregroundColor: Colors.white,
+                                  padding: EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+
+                                child: Text(
+                                  "Ikuti Test",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        isSudahDaftar && isSudahcomplete
+                                            ? Colors.white
+                                            : const Color.fromARGB(
+                                              255,
+                                              103,
+                                              99,
+                                              99,
+                                            ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Center(
+                              child: Container(
+                                width: 194,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF1B884B),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Color(0xFFFFFFFF),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Fasilitas",
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -285,35 +400,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ],
                             ),
-
-                            const SizedBox(height: 24),
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  context.goNamed(Routes.daftar_test);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(
-                                    0xFFFFA500,
-                                  ), // Warna oranye
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: Text(
-                                  "Ikuti Test",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
                           ],
                         ),
                       ),
@@ -349,6 +435,8 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (status) {
       case 'pending':
         return Colors.orange;
+      case 'belum bayar':
+        return Colors.orangeAccent;
       case 'verifikasi':
         return Colors.blue;
       case 'diterima':
@@ -364,6 +452,8 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (status) {
       case 'pending':
         return 'Pending';
+      case 'belum bayar':
+        return 'belum bayar';
       case 'verifikasi':
         return 'Sedang Diverifikasi';
       case 'diterima':
@@ -372,6 +462,36 @@ class _HomeScreenState extends State<HomeScreen> {
         return 'Ditolak';
       default:
         return 'Belum lengkap';
+    }
+  }
+
+  Color _getStatusPengumumanColor(String? status) {
+    switch (status) {
+      case 'belum bayar':
+        return Colors.orangeAccent;
+      case 'verifikasi':
+        return Colors.blue;
+      case 'sudah bayar':
+        return Colors.green;
+      case 'ditolak':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _getStatusPengumumanText(String? status) {
+    switch (status) {
+      case 'belum bayar':
+        return 'belum bayar';
+      case 'verifikasi':
+        return 'Sedang Diverifikasi';
+      case 'sudah bayar':
+        return 'sudah bayar';
+      case 'ditolak':
+        return 'Ditolak';
+      default:
+        return 'Belum bayar';
     }
   }
 
@@ -425,13 +545,100 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget buildPengumumanContainer(BuildContext context, ) {
+    return StreamBuilder<String>(
+      stream: PembayaranService().statusPembayaranStream(userId!),
+      builder: (context, snapshot) {
+        String status = snapshot.data ?? 'belum bayar';
+
+        return Container(
+          width: 416,
+          margin: EdgeInsets.only(bottom: 20),
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Color(0xFF278550),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 6,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Pengumuman PPDB SMK KREATIF NUSANTARA\nTahun Pelajaran 2024/2025',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Berdasarkan hasil seleksi administrasi, dengan ini kami menyatakan bahwa santri bernama Valent Prakasa Adityatmoko dinyatakan lulus tahap pemberkasan.',
+                style: TextStyle(color: Colors.white, fontSize: 14),
+              ),
+              SizedBox(height: 80),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getStatusPengumumanColor(status),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'Status: ${_getStatusPengumumanText(status)}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.goNamed(Routes.pembayaran);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFFCAA09),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: Color(0xFFFCAA09), width: 2),
+                      ),
+                    ),
+                    child: Text(
+                      'Lakukan pembayaran',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget buildSiswaContainer(SiswaModel siswa) {
     return Container(
-      width: 392,
+      width: 416,
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF278550), // warna hijau branding
+        color: Color(0xFF278550),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -484,18 +691,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
+              const SizedBox(width: 10),
               ElevatedButton(
-                onPressed: () {
-                  context.goNamed(Routes.lihatfiles, extra: siswa);
-                },
+                onPressed:
+                    isSudahcomplete
+                        ? null
+                        : () {
+                          context.goNamed(Routes.lihatfiles, extra: siswa);
+                        },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFCAA09),
+                  backgroundColor:
+                      isSudahcomplete ? Color(0xFF278550) : Color(0xFFFCAA09),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(
+                      color:
+                          isSudahcomplete
+                              ? Color(0xFFFFFFFF)
+                              : Color(0xFFFCAA09),
+                      width: 2,
+                    ),
                   ),
                 ),
                 child: Text(
-                  "Belum upload Berkas",
+                  isSudahcomplete ? "Sudah Complete" : "Lengkapi Berkas",
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     color: Colors.white,
@@ -516,7 +735,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(color: Color(0xFF278550)),
           borderRadius: BorderRadius.circular(12),
           color: Colors.white,
         ),
@@ -559,3 +778,122 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+// class PengumumanContainer extends StatefulWidget {
+//   @override
+//   State<PengumumanContainer> createState() => _PengumumanContainerState();
+// }
+
+// class _PengumumanContainerState extends State<PengumumanContainer> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width: 416,
+//       margin: EdgeInsets.only(bottom: 20),
+//       padding: EdgeInsets.all(20),
+//       decoration: BoxDecoration(
+//         color: Color(0xFF278550),
+//         borderRadius: BorderRadius.circular(12),
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.black.withOpacity(0.1),
+//             blurRadius: 6,
+//             offset: Offset(0, 3),
+//           ),
+//         ],
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             'Pengumuman PPDB SMK KREATIF NUSANTARA\nTahun Pelajaran 2024/2025',
+//             style: TextStyle(
+//               color: Colors.white,
+//               fontSize: 16,
+//               fontWeight: FontWeight.bold,
+//             ),
+//           ),
+//           SizedBox(height: 10),
+//           Text(
+//             'Berdasarkan hasil seleksi administrasi, dengan ini kami menyatakan bahwa satri name Valent Prakasa Adityatmoko dinyatakan lulus tahap pemberkasan.',
+//             style: TextStyle(color: Colors.white, fontSize: 14),
+//           ),
+//           SizedBox(height: 80),
+
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Container(
+//                 padding: const EdgeInsets.symmetric(
+//                   horizontal: 10,
+//                   vertical: 4,
+//                 ),
+//                 decoration: BoxDecoration(
+//                   color: Color(0xFF278550),
+//                   borderRadius: BorderRadius.circular(20),
+//                 ),
+//                 child: Text(
+//                   'Status: Belum bayar',
+//                   style: TextStyle(
+//                     color: Colors.white,
+//                     fontWeight: FontWeight.w500,
+//                   ),
+//                 ),
+//               ),
+//               ElevatedButton(
+//                 onPressed: () {
+//                   context.goNamed(Routes.pembayaran);
+//                 },
+//                 style: ElevatedButton.styleFrom(
+//                   backgroundColor: Color(0xFFFCAA09),
+//                   shape: RoundedRectangleBorder(
+//                     borderRadius: BorderRadius.circular(8),
+//                     side: BorderSide(color: Color(0xFFFCAA09), width: 2),
+//                   ),
+//                 ),
+//                 child: Text(
+//                   'Lakukan pembayaran',
+//                   style: GoogleFonts.poppins(
+//                     fontSize: 12,
+//                     color: Colors.white,
+//                     fontWeight: FontWeight.bold,
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+  // Color _getStatusPengumumanColor(String? status) {
+  //   switch (status) {
+  //     case 'belum bayar':
+  //       return Colors.orangeAccent;
+  //     case 'verifikasi':
+  //       return Colors.blue;
+  //     case 'sudah bayar':
+  //       return Colors.green;
+  //     case 'ditolak':
+  //       return Colors.red;
+  //     default:
+  //       return Colors.grey;
+  //   }
+  // }
+
+  // String _getStatusPengumumanText(String? status) {
+  //   switch (status) {
+  //     case 'belum bayar':
+  //       return 'belum bayar';
+  //     case 'verifikasi':
+  //       return 'Sedang Diverifikasi';
+  //     case 'sudah bayar':
+  //       return 'sudah bayar';
+  //     case 'ditolak':
+  //       return 'Ditolak';
+  //     default:
+  //       return 'Belum bayar';
+  //   }
+  // }
+// }

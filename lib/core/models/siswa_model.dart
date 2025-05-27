@@ -38,8 +38,9 @@ class SiswaModel {
     required this.kecamatan,
     required this.golonganDarah,
     required this.jenisKelamin,
-    this.status = 'complete',
+    this.status = 'pending',
   });
+
 
   Map<String, dynamic> toJson() => {
     'id': id,

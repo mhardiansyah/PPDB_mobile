@@ -1,19 +1,24 @@
 import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ppdb_be/core/models/daftar_test.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
+import 'package:ppdb_be/service/hasil_test_service.dart';
 import 'package:ppdb_be/service/soal_service.dart';
 
-class TestDiniahScreen extends StatefulWidget {
+class TestScreen extends StatefulWidget {
   final kategorisoalModel kategori;
-  const TestDiniahScreen({Key? key, required this.kategori}) : super(key: key);
+  const TestScreen({super.key, required this.kategori});
 
   @override
-  State<TestDiniahScreen> createState() => _TestDiniahScreenState();
+  State<TestScreen> createState() => _TestScreenState();
 }
 
-class _TestDiniahScreenState extends State<TestDiniahScreen> {
+class _TestScreenState extends State<TestScreen> {
+  String? userId;
   int remainingSeconds = 7200;
   Timer? _timer;
   List<SoalTest> soalList = [];
@@ -22,6 +27,10 @@ class _TestDiniahScreenState extends State<TestDiniahScreen> {
 
   @override
   void initState() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      userId = user.uid;
+    }
     super.initState();
     startTimer();
     fetchSoal();
@@ -173,8 +182,49 @@ class _TestDiniahScreenState extends State<TestDiniahScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.pop(context);
+                          onPressed: () async {
+                            int hasilSkor = 0;
+
+                            List<Map<String, dynamic>> jawabanDetail = [];
+
+                            for (int i = 0; i < soalList.length; i++) {
+                              final soal = soalList[i];
+                              final selected = selectedAnswers[i];
+                              final isBenar =
+                                  selected != null &&
+                                  soal.opsiJawaban[selected] ==
+                                      soal.jawabanBenar;
+
+                              if (isBenar) hasilSkor += 4;
+
+                              jawabanDetail.add({
+                                'pertanyaan': soal.pertanyaan,
+                                'jawabanUser':
+                                    selected != null
+                                        ? soal.opsiJawaban[selected]
+                                        : 'Kosong',
+                                'jawabanBenar': soal.jawabanBenar,
+                                'benar': isBenar,
+                              });
+                            }
+
+                            final hasilService = HasilTestService();
+                            await hasilService.simpanHasilTest(
+                              userId: userId.toString(),
+                              namaPelajaran: widget.kategori.nama_pelajaran,
+                              jawaban: jawabanDetail,
+                              skor: hasilSkor,
+                            );
+
+                            // navigasi ke hasil_test
+                            context.goNamed(
+                              Routes.hasil_test,
+                              extra: {
+                                'selectedAnswers': selectedAnswers,
+                                'soalList': soalList,
+                                'skor': hasilSkor,
+                              },
+                            );
                           },
                           child: const Text(
                             'Submit',

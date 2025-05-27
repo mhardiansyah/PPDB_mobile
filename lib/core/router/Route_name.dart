@@ -12,4 +12,7 @@ class Routes {
   static const String lihatfiles = '/lihatfiles';
   static const String daftar_test = '/daftar_test';
   static const String test_diniah = '/test_diniah';
+  static const String test_screen = '/test_screen';
+  static const String hasil_test = '/hasil_test';
+  static const String pembayaran = '/pembayaran';
 }

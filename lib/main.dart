@@ -1,12 +1,39 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
 import 'package:ppdb_be/firebase_options.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // Handle background messages here
+  await Firebase.initializeApp();
+  print("Handling a background message: ${message.messageId}");
+}
+
+void setupFCM() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  NotificationSettings settings = await messaging.requestPermission();
+  print('Izin notifikasi: ${settings.authorizationStatus}');
+
+  String? token = await messaging.getToken();
+  print('Token FCM: $token');
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Notifikasi saat app dibuka: ${message.notification?.title}');
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    print('User klik notifikasi: ${message.notification?.body}');
+  });
+}
+
 Future main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  WidgetsFlutterBinding.ensureInitialized();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
 

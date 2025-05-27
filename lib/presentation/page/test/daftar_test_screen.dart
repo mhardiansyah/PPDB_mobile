@@ -1,4 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ppdb_be/core/models/daftar_test.dart';
+import 'package:ppdb_be/core/router/App_router.dart';
+import 'package:ppdb_be/service/soal_service.dart';
 
 class DaftarTestScreen extends StatefulWidget {
   const DaftarTestScreen({super.key});
@@ -8,28 +13,52 @@ class DaftarTestScreen extends StatefulWidget {
 }
 
 class _DaftarTestScreenState extends State<DaftarTestScreen> {
-  final List<Map<String, String>> testList = [
-    {
-      "title": "Agama",
-      "description": "Latihan Soal Rukun Iman dan Rukun Islam",
-      "image": "assets/images/agama.png",
-    },
-    {
-      "title": "matematika",
-      "description": "Materi Dasar Komputer dan Internet",
-      "image": "assets/images/mtk.png",
-    },
-    {
-      "title": "inggris",
-      "description": "Pengetahuan Inggris",
-      "image": "assets/images/inggris.png",
-    },
-    {
-      "title": "psikolog",
-      "description": "Latihan Mengenal Diri Sendiri",
-      "image": "assets/images/logika.png",
-    },
-  ];
+  final SoalService _soalService = SoalService();
+  List<kategorisoalModel> _kategoriSoalList = [];
+  bool _isLoading = true;
+  String? userId;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      userId = user.uid;
+    }
+
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final data = await _soalService.fetchKategoriSoal();
+    setState(() {
+      _kategoriSoalList = data;
+      _isLoading = false;
+    });
+  }
+
+  // final List<Map<String, String>> testList = [
+  //   {
+  //     "title": "Agama",
+  //     "description": "Latihan Soal Rukun Iman dan Rukun Islam",
+  //     "image": "assets/images/agama.png",
+  //   },
+  //   {
+  //     "title": "matematika",
+  //     "description": "Materi Dasar Komputer dan Internet",
+  //     "image": "assets/images/mtk.png",
+  //   },
+  //   {
+  //     "title": "inggris",
+  //     "description": "Pengetahuan Inggris",
+  //     "image": "assets/images/inggris.png",
+  //   },
+  //   {
+  //     "title": "psikolog",
+  //     "description": "Latihan Mengenal Diri Sendiri",
+  //     "image": "assets/images/logika.png",
+  //   },
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -66,97 +95,129 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
             ),
           ],
         ),
+        leading: BackButton(
+          color: Colors.white,
+          onPressed: () {
+            context.goNamed(Routes.home);
+          },
+        ),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: testList.length,
-          itemBuilder: (context, index) {
-            final item = testList[index];
-            return Card(
-              margin: const EdgeInsets.only(bottom: 20),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(12),
-                    ),
-                    child: Image.asset(
-                      item["image"]!,
-                      width: double.infinity,
-                      height: 130,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item["title"]!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ListView.builder(
+                  itemCount: _kategoriSoalList.length,
+                  itemBuilder: (context, index) {
+                    final item = _kategoriSoalList[index];
+                    print("item: $item");
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(12),
+                            ),
+                            child: Image.network(
+                              item.image_url,
+                              width: double.infinity,
+                              height: 130,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (context, error, stackTrace) => Image.asset(
+                                    'assets/images/default_gambar.png',
+                                    width: double.infinity,
+                                    height: 130,
+                                    fit: BoxFit.cover,
+                                  ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          item["description"]!,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: const [
-                                Icon(Icons.access_time, size: 16),
-                                SizedBox(width: 4),
-                                Text("2 Jam", style: TextStyle(fontSize: 12)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.nama_pelajaran,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  item.deskripsi,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: const [
+                                        Icon(Icons.access_time, size: 16),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          "2 Jam",
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xFF278550),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                          vertical: 8,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        context.goNamed(
+                                          Routes.test_screen,
+                                          extra: item,
+                                        );
+                                      },
+                                      child: const Text(
+                                        "Mulai tes",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF278550),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 8,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              onPressed: () {
-                                // Navigate ke halaman tes 
-                                
-                              },
-                              child: const Text("Mulai tes", style: TextStyle(fontSize: 12, color: Colors.white)),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
-            );
-          },
-        ),
-      ),
     );
   }
 }

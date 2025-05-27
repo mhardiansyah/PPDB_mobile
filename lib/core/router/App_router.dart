@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
+import 'package:ppdb_be/core/models/daftar_test.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/presentation/page/Form_screen.dart';
+import 'package:ppdb_be/presentation/page/Pembayaran_screen.dart';
 import 'package:ppdb_be/presentation/page/Splash_screen.dart';
 import 'package:ppdb_be/presentation/page/edit_files_screen.dart';
 import 'package:ppdb_be/presentation/page/form_files_screen.dart';
@@ -9,6 +11,9 @@ import 'package:ppdb_be/presentation/page/Login_screen.dart';
 import 'package:ppdb_be/presentation/page/Register_screen.dart';
 import 'package:ppdb_be/presentation/page/edit_berkas_screen.dart';
 import 'package:ppdb_be/presentation/page/test/daftar_test_screen.dart';
+import 'package:ppdb_be/presentation/page/test/hasil_test_screen.dart';
+import 'package:ppdb_be/presentation/page/test/test_diniah_screen.dart';
+import 'package:ppdb_be/presentation/page/test/test_screen.dart';
 
 part 'Route_name.dart';
 
@@ -67,4 +72,42 @@ final appRoute = [
     name: Routes.daftar_test,
     builder: (context, state) => const DaftarTestScreen(),
   ),
+  GoRoute(
+    path: '/test_diniah',
+    name: Routes.test_diniah,
+    builder: (context, state) {
+      final kategori = state.extra as kategorisoalModel;
+      return TestDiniahScreen(kategori: kategori);
+    },
+  ),
+  GoRoute(
+    path: '/test_screen',
+    name: Routes.test_screen,
+    builder: (context, state) {
+      final kategori = state.extra as kategorisoalModel;
+      return TestScreen(kategori: kategori);
+    },
+  ),
+  GoRoute(
+    name: Routes.hasil_test,
+    path: '/hasil-test',
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>;
+      return HasilTestScreen(extra: extra);
+    },
+  ),
+//   GoRoute(
+//   name: Routes.pembayaran,
+//   path: '/pembayaran',
+//   builder: (context, state) {
+//     final siswa = state.extra as SiswaModel;
+//     return PembayaranScreen(siswa: siswa);
+//   },
+// ),
+GoRoute(
+    path: '/pembayaran',
+    name: Routes.pembayaran,
+    builder: (context, state) => const PembayaranScreen(),
+  ),
+
 ];

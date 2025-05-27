@@ -56,16 +56,16 @@ class BerkasModel {
       aktaKelahiranUrl: map['aktaKelahiranUrl'] ?? '',
     );
   }
-  factory BerkasModel.fromJson(String id, Map<String, dynamic> map) {
-    return BerkasModel(
-      id: id,
-      siswaId: map['siswaId'] ?? '',
-      foto3x4Url: map['foto3x4Url'] ?? '',
-      ijazahUrl: map['ijazahUrl'] ?? '',
-      kartuKeluargaUrl: map['kartuKeluargaUrl'] ?? '',
-      raporUrl: map['raporUrl'] ?? '',
-      suratKeteranganLulusUrl: map['suratKeteranganLulusUrl'] ?? '',
-      aktaKelahiranUrl: map['aktaKelahiranUrl'] ?? '',
-    );
-  }
+  factory BerkasModel.fromJson(Map<String, dynamic> json) {
+  return BerkasModel(
+    foto3x4Url: json['foto3x4Url'] ?? '',
+    ijazahUrl: json['ijazahUrl'] ?? '',
+    kartuKeluargaUrl: json['kartuKeluargaUrl'] ?? '',
+    raporUrl: json['raporUrl'] ?? '',
+    suratKeteranganLulusUrl: json['suratKeteranganLulusUrl'] ?? '',
+    aktaKelahiranUrl: json['aktaKelahiranUrl'] ?? '',
+    siswaId: json['siswaId'] ?? '',
+  );
+}
+
 }

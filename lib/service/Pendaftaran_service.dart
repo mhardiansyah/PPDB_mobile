@@ -56,43 +56,46 @@ class PendaftaranService {
   //   }
   // }
 
+  Future updateBerkasBySiswaId(
+    String siswaId,
+    Map<String, dynamic> dataBerkas,
+  ) async {
+    final _pendaftaranCollection = FirebaseFirestore.instance.collection(
+      'pendaftaran',
+    );
 
-Future updateBerkasBySiswaId(String siswaId, Map<String, dynamic> dataBerkas) async {
-  final _pendaftaranCollection = FirebaseFirestore.instance.collection('pendaftaran');
+    try {
+      // Query dokumen berdasarkan berkas.siswaId
+      final querySnapshot =
+          await _pendaftaranCollection
+              .where('berkas.siswaId', isEqualTo: siswaId)
+              .limit(1)
+              .get();
 
-  try {
-    // Query dokumen berdasarkan berkas.siswaId
-    final querySnapshot = await _pendaftaranCollection
-        .where('berkas.siswaId', isEqualTo: siswaId)
-        .limit(1)
-        .get();
+      if (querySnapshot.docs.isEmpty) {
+        print('Dokumen dengan siswaId $siswaId tidak ditemukan.');
+        return;
+      }
 
-    if (querySnapshot.docs.isEmpty) {
-      print('Dokumen dengan siswaId $siswaId tidak ditemukan.');
-      return;
+      // Ambil ID dokumen
+      final docId = querySnapshot.docs.first.id;
+
+      // Update field berkas
+      await _pendaftaranCollection.doc(docId).update({
+        'berkas.foto3x4Url': dataBerkas['foto3x4Url'],
+        'berkas.ijazahUrl': dataBerkas['ijazahUrl'],
+        'berkas.kartuKeluargaUrl': dataBerkas['kartuKeluargaUrl'],
+        'berkas.raporUrl': dataBerkas['raporUrl'],
+        'berkas.suratKeteranganLulusUrl': dataBerkas['suratKeteranganLulusUrl'],
+        'berkas.aktaKelahiranUrl': dataBerkas['aktaKelahiranUrl'],
+      });
+
+      print('Update berkas berhasil untuk siswaId $siswaId');
+    } catch (e) {
+      print('Gagal update berkas: $e');
+      rethrow;
     }
-
-    // Ambil ID dokumen
-    final docId = querySnapshot.docs.first.id;
-
-    // Update field berkas
-    await _pendaftaranCollection.doc(docId).update({
-      'berkas.foto3x4Url': dataBerkas['foto3x4Url'],
-      'berkas.ijazahUrl': dataBerkas['ijazahUrl'],
-      'berkas.kartuKeluargaUrl': dataBerkas['kartuKeluargaUrl'],
-      'berkas.raporUrl': dataBerkas['raporUrl'],
-      'berkas.suratKeteranganLulusUrl': dataBerkas['suratKeteranganLulusUrl'],
-      'berkas.aktaKelahiranUrl': dataBerkas['aktaKelahiranUrl'],
-    });
-
-    print('Update berkas berhasil untuk siswaId $siswaId');
-  } catch (e) {
-    print('Gagal update berkas: $e');
-    rethrow;
   }
-}
-
-
 
   Future addSiswa(SiswaModel siswa) async {
     final prefs = await SharedPreferences.getInstance();
@@ -110,6 +113,19 @@ Future updateBerkasBySiswaId(String siswaId, Map<String, dynamic> dataBerkas) as
           return snapshot.docs.map((doc) {
             final data = doc.data();
             return SiswaModel.fromJson(data['siswa']);
+          }).toList();
+        });
+  }
+
+  Stream<List<BerkasModel>> getBerkasByUserId(String userId) {
+    return FirebaseFirestore.instance
+        .collection('pendaftaran')
+        .where("siswa.userid", isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final data = doc.data();
+            return BerkasModel.fromJson(data['berkas']);
           }).toList();
         });
   }
