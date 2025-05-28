@@ -96,18 +96,18 @@ final appRoute = [
       return HasilTestScreen(extra: extra);
     },
   ),
-//   GoRoute(
-//   name: Routes.pembayaran,
-//   path: '/pembayaran',
-//   builder: (context, state) {
-//     final siswa = state.extra as SiswaModel;
-//     return PembayaranScreen(siswa: siswa);
-//   },
-// ),
-GoRoute(
-    path: '/pembayaran',
-    name: Routes.pembayaran,
-    builder: (context, state) => const PembayaranScreen(),
-  ),
+  GoRoute(
+  name: Routes.pembayaran,
+  path: '/pembayaran',
+  builder: (context, state) {
+    final siswa = state.extra as SiswaModel;
+    return PembayaranScreen(siswa: siswa);
+  },
+),
+// GoRoute(
+//     path: '/pembayaran',
+//     name: Routes.pembayaran,
+//     builder: (context, state) => const PembayaranScreen(),
+//   ),
 
 ];

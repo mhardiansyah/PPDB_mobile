@@ -291,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
 
                             const SizedBox(height: 20),
-                            Center(child: buildPengumumanContainer(context,)),
+                            Center(child: buildPengumumanContainer(context)),
                             const SizedBox(height: 20),
                             SizedBox(
                               width: double.infinity,
@@ -545,11 +545,29 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget buildPengumumanContainer(BuildContext context, ) {
-    return StreamBuilder<String>(
-      stream: PembayaranService().statusPembayaranStream(userId!),
+  Widget buildPengumumanContainer(BuildContext context) {
+    return StreamBuilder<List<SiswaModel>>(
+      stream: PendaftaranService().getPendaftaranByUserId(userId!),
       builder: (context, snapshot) {
-        String status = snapshot.data ?? 'belum bayar';
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator.adaptive(
+              backgroundColor: Colors.green,
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation(Colors.green),
+            ),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text("Data siswa tidak tersedia"));
+        }
+
+        final siswaList = snapshot.data!;
+        final siswa = siswaList.first;
+        print("Nama Siswa: ${siswa.nama}");
+        print("Status: ${siswa.status}");
+        print("id: ${siswa.id}");
 
         return Container(
           width: 416,
@@ -579,7 +597,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 10),
               Text(
-                'Berdasarkan hasil seleksi administrasi, dengan ini kami menyatakan bahwa santri bernama Valent Prakasa Adityatmoko dinyatakan lulus tahap pemberkasan.',
+                'Berdasarkan hasil seleksi administrasi, dengan ini kami menyatakan bahwa santri bernama ${siswa.nama} dinyatakan lulus tahap pemberkasan.',
                 style: TextStyle(color: Colors.white, fontSize: 14),
               ),
               SizedBox(height: 80),
@@ -592,11 +610,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getStatusPengumumanColor(status),
+                      color: _getStatusPengumumanColor(siswa.status),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      'Status: ${_getStatusPengumumanText(status)}',
+                      'Status: ${_getStatusPengumumanText(siswa.status)}',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
@@ -605,7 +623,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      context.goNamed(Routes.pembayaran);
+                      if (siswa != null) {
+                        context.goNamed(Routes.pembayaran, extra: siswa);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Data siswa tidak tersedia'),
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFFCAA09),

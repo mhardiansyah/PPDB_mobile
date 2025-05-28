@@ -11,8 +11,8 @@ import 'package:ppdb_be/service/pembayaran_service.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class PembayaranScreen extends StatefulWidget {
-  // final SiswaModel siswa;
-  const PembayaranScreen({super.key, });
+  final SiswaModel siswa;
+  const PembayaranScreen({super.key, required this.siswa});
 
   @override
   State<PembayaranScreen> createState() => _PembayaranScreenState();
@@ -24,11 +24,17 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
   PembayaranModel? pembayaran;
   Uint8List? _buktiBayarBytes;
   final ImagePicker _picker = ImagePicker();
-  SiswaModel? siswa;
+  // SiswaModel? siswa;
 
   @override
   void initState() {
     super.initState();
+    SiswaModel siswa = widget.siswa;
+    if (siswa != null) {
+      print("Siswa ID: ${siswa.id}");
+    } else {
+      print("Siswa data is null");
+    }
   }
 
   Future<void> _pickImage() async {
@@ -45,8 +51,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
   }
 
   Future<void> _submitPembayaran() async {
-    final siswaId =
-        siswa?.id; // Ambil ID dari data siswa yang dikirim via extra
+    final siswaId = widget.siswa.id;
     print("siswaId: $siswaId");
 
     if (_buktiBayarBytes == null) {
@@ -72,7 +77,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
 
       // Simpan data ke Firestore
       await _pembayaranService.tambahPembayaran(
-        siswaId: siswaId.toString(),
+        siswaId: siswaId ?? '',
         metodePembayaran: 'Transfer',
         jumlah: 250000,
         buktiBayarBytes: _buktiBayarBytes,
@@ -80,7 +85,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
 
       setState(() {
         pembayaran = PembayaranModel(
-          siswaId: siswaId.toString(),
+          siswaId: siswaId ?? '',
           buktiPembayaranUrl: buktiPembayaranUrl,
           tanggalPembayaran: DateTime.now(),
           status: 'belum bayar',
