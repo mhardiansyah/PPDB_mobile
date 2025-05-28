@@ -9,6 +9,7 @@ import 'package:ppdb_be/core/router/App_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ppdb_be/service/pembayaran_service.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class PembayaranScreen extends StatefulWidget {
   final SiswaModel siswa;
@@ -76,25 +77,40 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
       }
 
       await _pembayaranService.tambahPembayaran(
+        id: const Uuid().v4(),
         siswaId: siswaId ?? '',
         metodePembayaran: 'Transfer',
         jumlah: 250000,
         buktiBayarBytes: _buktiBayarBytes,
       );
 
+      // final newPembayaran = PembayaranModel(
+      //   siswaId: siswaId ?? '',
+      //   buktiPembayaranUrl: buktiPembayaranUrl,
+      //   tanggalPembayaran: DateTime.now(),
+      //   status: pembayaran?.status,
+      // );
+
+      // setState(() {
+      //   pembayaran = newPembayaran;
+      // });
+
       setState(() {
         pembayaran = PembayaranModel(
+          id: const Uuid().v4(),
           siswaId: siswaId ?? '',
           buktiPembayaranUrl: buktiPembayaranUrl,
           tanggalPembayaran: DateTime.now(),
-          status: 'belum bayar',
+          status: 'sudah bayar',
         );
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Pembayaran berhasil ditambahkan')),
       );
-      context.goNamed(Routes.home, extra: pembayaran);
+      print("Pembayaran sebelum navigasi: $pembayaran");
+
+      context.goNamed(Routes.home);
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -140,7 +156,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
         leading: BackButton(
           color: Colors.white,
           onPressed: () {
-            context.goNamed(Routes.home, extra: pembayaran);
+            context.goNamed(Routes.home);
           },
         ),
         shape: const RoundedRectangleBorder(

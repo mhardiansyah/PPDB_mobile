@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -15,8 +16,8 @@ import 'package:ppdb_be/widgets/notif_failed.dart';
 import 'package:ppdb_be/widgets/notif_succes.dart';
 
 class HomeScreen extends StatefulWidget {
-  final PembayaranModel? pembayaran;
-  const HomeScreen({super.key, required this.pembayaran});
+  // final PembayaranModel? pembayaran;
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -27,7 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
   String? userId;
   bool isSudahDaftar = false;
   bool isSudahcomplete = false;
-
+  bool isSudahbayar = false;
+  bool isSudahTest = false;
+  SiswaModel? siswa;
   @override
   void initState() {
     super.initState();
@@ -36,12 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
       userId = user.uid;
       cekPendaftaran(user.uid);
       cekberkas(user.uid);
+      ceksudahTest(user.uid);
     }
-    // PembayaranModel? pembayaransiswa = widget.pembayaran;
-    // if (pembayaransiswa != null) {
-    //   print("pembayaran: $pembayaransiswa.siswaId");
-    //   // cekPembayaran(pembayaran);
-    // }
   }
 
   void cekPendaftaran(String uid) async {
@@ -51,6 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         isSudahDaftar = firstData.isNotEmpty;
       });
+    }
+
+    if (firstData.isNotEmpty) {
+      final siswaId = firstData[0].id;
+      cekPembayaran(siswaId!);
     }
   }
 
@@ -81,6 +85,30 @@ class _HomeScreenState extends State<HomeScreen> {
           isSudahcomplete = false;
         });
       }
+    }
+  }
+
+  void cekPembayaran(String siswaId) async {
+    final stream = PembayaranService().getPembayaranBySiswaId(siswaId);
+    final firstData = await stream.first;
+    if (mounted) {
+      setState(() {
+        isSudahbayar = firstData?.status == 'sudah bayar';
+      });
+    }
+  }
+
+  void ceksudahTest(String userId) async {
+    final hasilTest =
+        await FirebaseFirestore.instance
+            .collection('hasil_test')
+            .where('userId', isEqualTo: userId)
+            .get();
+
+    if (mounted) {
+      setState(() {
+        isSudahTest = hasilTest.docs.length >= 4;
+      });
     }
   }
 
@@ -267,83 +295,49 @@ class _HomeScreenState extends State<HomeScreen> {
                                 },
                               ),
                             ),
-                            const SizedBox(height: 80),
                             Center(
-                              child: Container(
-                                width: 194,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF1B884B),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Color(0xFFFFFFFF),
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "Pengumuman",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 20),
-                            Center(child: buildPengumumanContainer(context)),
-                            const SizedBox(height: 20),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed:
-                                    isSudahDaftar && isSudahcomplete
-                                        ? () {
-                                          context.goNamed(Routes.daftar_test);
-                                        }
-                                        : null,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      isSudahDaftar && isSudahcomplete
-                                          ? Color(0xFFFFA500)
-                                          : const Color.fromARGB(
-                                            255,
-                                            72,
-                                            68,
-                                            68,
+                              child:
+                                  isSudahcomplete
+                                      ? Container(
+                                        width: 194,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                          vertical: 8,
+                                        ),
+                                        margin: EdgeInsets.only(top: 40),
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFF1B884B),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
                                           ),
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-
-                                child: Text(
-                                  "Ikuti Test",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        isSudahDaftar && isSudahcomplete
-                                            ? Colors.white
-                                            : const Color.fromARGB(
-                                              255,
-                                              103,
-                                              99,
-                                              99,
+                                          border: Border.all(
+                                            color: Color(0xFFFFFFFF),
+                                            width: 2,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            "Pengumuman",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
                                             ),
-                                  ),
-                                ),
-                              ),
+                                          ),
+                                        ),
+                                      )
+                                      : null,
+                            ),
+
+                            const SizedBox(height: 20),
+                            Center(
+                              child:
+                                  isSudahcomplete
+                                      ? buildPengumumanContainer(context)
+                                      : null,
                             ),
                             const SizedBox(height: 20),
+
                             Center(
                               child: Container(
                                 width: 194,
@@ -441,7 +435,7 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (status) {
       case 'pending':
         return Colors.orange;
-      case 'belum bayar':
+      case 'berkas diterima':
         return Colors.orangeAccent;
       case 'verifikasi':
         return Colors.blue;
@@ -450,7 +444,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'ditolak':
         return Colors.red;
       default:
-        return Colors.grey; // fallback jika null atau status tak dikenal
+        return Colors.grey;
     }
   }
 
@@ -458,8 +452,8 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (status) {
       case 'pending':
         return 'Pending';
-      case 'belum bayar':
-        return 'belum bayar';
+      case 'berkas diterima':
+        return 'berkas diterima';
       case 'verifikasi':
         return 'Sedang Diverifikasi';
       case 'diterima':
@@ -478,6 +472,8 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'verifikasi':
         return Colors.blue;
       case 'sudah bayar':
+        return Colors.greenAccent;
+      case 'diterima':
         return Colors.green;
       case 'ditolak':
         return Colors.red;
@@ -494,6 +490,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return 'Sedang Diverifikasi';
       case 'sudah bayar':
         return 'sudah bayar';
+      case 'diterima':
+        return 'Diterima';
       case 'ditolak':
         return 'Ditolak';
       default:
@@ -552,7 +550,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildPengumumanContainer(BuildContext context) {
-    final PembayaranModel? pengumuman = widget.pembayaran;
     return StreamBuilder<List<SiswaModel>>(
       stream: PendaftaranService().getPendaftaranByUserId(userId!),
       builder: (context, snapshot) {
@@ -572,96 +569,143 @@ class _HomeScreenState extends State<HomeScreen> {
 
         final siswaList = snapshot.data!;
         final siswa = siswaList.first;
-        print("Nama Siswa: ${siswa.nama}");
-        print("Status: ${siswa.status}");
-        print("id: ${siswa.id}");
 
-        return Container(
-          width: 416,
-          margin: EdgeInsets.only(bottom: 20),
-          padding: EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Color(0xFF278550),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 6,
-                offset: Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Pengumuman PPDB SMK KREATIF NUSANTARA\nTahun Pelajaran 2024/2025',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'Berdasarkan hasil seleksi administrasi, dengan ini kami menyatakan bahwa santri bernama ${siswa.nama} dinyatakan lulus tahap pemberkasan.',
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              ),
-              SizedBox(height: 80),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getStatusPengumumanColor(
-                        pengumuman?.status ?? 'belum bayar',
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'Status: ${_getStatusPengumumanText(pengumuman?.status ?? 'belum bayar')}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (siswa != null) {
-                        context.goNamed(Routes.pembayaran, extra: siswa);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Data siswa tidak tersedia'),
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFCAA09),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Color(0xFFFCAA09), width: 2),
-                      ),
-                    ),
-                    child: Text(
-                      'Lakukan pembayaran',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+        String pesan1;
+        String pesan2;
+        String pesan3;
+        Color warnabtn;
+
+        if (!isSudahbayar) {
+          pesan1 =
+              'Berdasarkan hasil pemeriksaan berkas, calon santri atas nama ${siswa.nama} dinyatakan lolos seleksi administrasi.';
+          pesan2 =
+              'Selanjutnya, mohon untuk segera melakukan pembayaran uang tes sebagai syarat mengikuti tahap berikutnya dalam proses PPDB Tahun Pelajaran 2024/2025.';
+          pesan3 = 'Pembayaran';
+          warnabtn = Color(0xFFFCAA09);
+        } else if (isSudahbayar && !isSudahTest) {
+          pesan1 =
+              'Terima kasih, kami telah menerima pembayaran uang tes Anda.';
+          pesan2 =
+              'Selanjutnya, calon santri dijadwalkan untuk mengikuti tahap ujian seleksi masuk SMK KREATIF NUSANTARA Tahun Pelajaran 2024/2025.';
+          pesan3 = 'Mulai test';
+          warnabtn = Color(0xFFFCAA09);
+        } else if (isSudahbayar && isSudahTest) {
+          pesan1 =
+              'Silahkan tunggu untuk informasi lebih lanjut tentang hasil ujian seleksi masuk SMK KREATIF NUSANTARA Tahun Pelajaran 2024/2025.';
+          pesan2 = 'Terima kasih telah mengikuti PPDB SMK KREATIF NUSANTARA';
+          pesan3 = 'Done';
+          warnabtn = Color(0xFF278550);
+        } else {
+          pesan1 = "";
+          pesan2 = "";
+          pesan3 = "";
+          warnabtn = Colors.grey;
+        }
+
+        return StreamBuilder<PembayaranModel?>(
+          stream: PembayaranService().getPembayaranBySiswaId(siswa.id!),
+          builder: (context, pembayaranSnapshot) {
+            if (pembayaranSnapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator.adaptive());
+            }
+
+            final pembayaran = pembayaranSnapshot.data;
+            print("Status Pembayaran: ${pembayaran?.status}");
+            print("User ID: $userId");
+
+            return Container(
+              width: 416,
+              margin: EdgeInsets.only(bottom: 20),
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Color(0xFF278550),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
                   ),
                 ],
               ),
-            ],
-          ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Pengumuman PPDB SMK KREATIF NUSANTARA\nTahun Pelajaran 2024/2025',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 40),
+                  Text(
+                    pesan1,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+
+                  SizedBox(height: 80),
+                  Text(
+                    pesan2,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  SizedBox(height: 80),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getStatusPengumumanColor(pembayaran?.status),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'Status: ${_getStatusPengumumanText(pembayaran?.status)}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (!isSudahbayar) {
+                            context.goNamed(Routes.pembayaran, extra: siswa);
+                          } else if (isSudahbayar && !isSudahTest) {
+                            context.goNamed(Routes.daftar_test);
+                          } else if (isSudahbayar && isSudahTest) {
+                            null;
+                          }
+                        },
+
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: warnabtn,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          pesan3,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
@@ -813,122 +857,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-// class PengumumanContainer extends StatefulWidget {
-//   @override
-//   State<PengumumanContainer> createState() => _PengumumanContainerState();
-// }
-
-// class _PengumumanContainerState extends State<PengumumanContainer> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: 416,
-//       margin: EdgeInsets.only(bottom: 20),
-//       padding: EdgeInsets.all(20),
-//       decoration: BoxDecoration(
-//         color: Color(0xFF278550),
-//         borderRadius: BorderRadius.circular(12),
-//         boxShadow: [
-//           BoxShadow(
-//             color: Colors.black.withOpacity(0.1),
-//             blurRadius: 6,
-//             offset: Offset(0, 3),
-//           ),
-//         ],
-//       ),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(
-//             'Pengumuman PPDB SMK KREATIF NUSANTARA\nTahun Pelajaran 2024/2025',
-//             style: TextStyle(
-//               color: Colors.white,
-//               fontSize: 16,
-//               fontWeight: FontWeight.bold,
-//             ),
-//           ),
-//           SizedBox(height: 10),
-//           Text(
-//             'Berdasarkan hasil seleksi administrasi, dengan ini kami menyatakan bahwa satri name Valent Prakasa Adityatmoko dinyatakan lulus tahap pemberkasan.',
-//             style: TextStyle(color: Colors.white, fontSize: 14),
-//           ),
-//           SizedBox(height: 80),
-
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             children: [
-//               Container(
-//                 padding: const EdgeInsets.symmetric(
-//                   horizontal: 10,
-//                   vertical: 4,
-//                 ),
-//                 decoration: BoxDecoration(
-//                   color: Color(0xFF278550),
-//                   borderRadius: BorderRadius.circular(20),
-//                 ),
-//                 child: Text(
-//                   'Status: Belum bayar',
-//                   style: TextStyle(
-//                     color: Colors.white,
-//                     fontWeight: FontWeight.w500,
-//                   ),
-//                 ),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () {
-//                   context.goNamed(Routes.pembayaran);
-//                 },
-//                 style: ElevatedButton.styleFrom(
-//                   backgroundColor: Color(0xFFFCAA09),
-//                   shape: RoundedRectangleBorder(
-//                     borderRadius: BorderRadius.circular(8),
-//                     side: BorderSide(color: Color(0xFFFCAA09), width: 2),
-//                   ),
-//                 ),
-//                 child: Text(
-//                   'Lakukan pembayaran',
-//                   style: GoogleFonts.poppins(
-//                     fontSize: 12,
-//                     color: Colors.white,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-  // Color _getStatusPengumumanColor(String? status) {
-  //   switch (status) {
-  //     case 'belum bayar':
-  //       return Colors.orangeAccent;
-  //     case 'verifikasi':
-  //       return Colors.blue;
-  //     case 'sudah bayar':
-  //       return Colors.green;
-  //     case 'ditolak':
-  //       return Colors.red;
-  //     default:
-  //       return Colors.grey;
-  //   }
-  // }
-
-  // String _getStatusPengumumanText(String? status) {
-  //   switch (status) {
-  //     case 'belum bayar':
-  //       return 'belum bayar';
-  //     case 'verifikasi':
-  //       return 'Sedang Diverifikasi';
-  //     case 'sudah bayar':
-  //       return 'sudah bayar';
-  //     case 'ditolak':
-  //       return 'Ditolak';
-  //     default:
-  //       return 'Belum bayar';
-  //   }
-  // }
-// }

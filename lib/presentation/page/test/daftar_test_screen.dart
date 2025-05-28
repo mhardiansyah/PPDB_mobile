@@ -2,8 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ppdb_be/core/models/daftar_test.dart';
+import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
 import 'package:ppdb_be/service/soal_service.dart';
+import 'package:ppdb_be/service/hasil_test_service.dart';
 
 class DaftarTestScreen extends StatefulWidget {
   const DaftarTestScreen({super.key});
@@ -14,9 +16,13 @@ class DaftarTestScreen extends StatefulWidget {
 
 class _DaftarTestScreenState extends State<DaftarTestScreen> {
   final SoalService _soalService = SoalService();
+  final HasilTestService _hasilTestService = HasilTestService();
+
   List<kategorisoalModel> _kategoriSoalList = [];
+  List<String> sudahDikerjakanList = [];
   bool _isLoading = true;
   String? userId;
+  SiswaModel? siswa;
 
   @override
   void initState() {
@@ -24,41 +30,21 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       userId = user.uid;
+      fetchData();
     }
-
-    fetchData();
   }
 
   Future<void> fetchData() async {
-    final data = await _soalService.fetchKategoriSoal();
+    final kategori = await _soalService.fetchKategoriSoal();
+    final sudahDikerjakan = await _hasilTestService
+        .getKategoriYangSudahDikerjakan(userId!);
+
     setState(() {
-      _kategoriSoalList = data;
+      _kategoriSoalList = kategori;
+      sudahDikerjakanList = sudahDikerjakan;
       _isLoading = false;
     });
   }
-
-  // final List<Map<String, String>> testList = [
-  //   {
-  //     "title": "Agama",
-  //     "description": "Latihan Soal Rukun Iman dan Rukun Islam",
-  //     "image": "assets/images/agama.png",
-  //   },
-  //   {
-  //     "title": "matematika",
-  //     "description": "Materi Dasar Komputer dan Internet",
-  //     "image": "assets/images/mtk.png",
-  //   },
-  //   {
-  //     "title": "inggris",
-  //     "description": "Pengetahuan Inggris",
-  //     "image": "assets/images/inggris.png",
-  //   },
-  //   {
-  //     "title": "psikolog",
-  //     "description": "Latihan Mengenal Diri Sendiri",
-  //     "image": "assets/images/logika.png",
-  //   },
-  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +100,9 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
                   itemCount: _kategoriSoalList.length,
                   itemBuilder: (context, index) {
                     final item = _kategoriSoalList[index];
-                    print("item: $item");
+                    final sudahDikerjakan = sudahDikerjakanList.contains(
+                      item.nama_pelajaran,
+                    );
 
                     return Card(
                       margin: const EdgeInsets.only(bottom: 20),
@@ -182,7 +170,10 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
                                     ),
                                     ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xFF278550),
+                                        backgroundColor:
+                                            sudahDikerjakan
+                                                ? Colors.grey
+                                                : const Color(0xFF278550),
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 20,
                                           vertical: 8,
@@ -193,15 +184,30 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
                                           ),
                                         ),
                                       ),
+                                      // onPressed:
+                                      //     (sudahDikerjakan || siswa == null)
+                                      //         ? null
+                                      //         : () {
+                                      //           print(
+                                      //             "Navigating with siswa: $siswa",
+                                      //           );
+                                      //           context.goNamed(
+                                      //             Routes.test_screen,
+                                      //             extra: {
+                                      //               'item': item,
+                                      //               'siswa': siswa,
+                                      //             },
+                                      //           );
+                                      //         },
                                       onPressed: () {
-                                        context.goNamed(
-                                          Routes.test_screen,
-                                          extra: item,
-                                        );
+                                        context.goNamed(Routes.test_screen, extra: item);
                                       },
-                                      child: const Text(
-                                        "Mulai tes",
-                                        style: TextStyle(
+
+                                      child: Text(
+                                        sudahDikerjakan
+                                            ? "Sudah dikerjakan"
+                                            : "Mulai tes",
+                                        style: const TextStyle(
                                           fontSize: 12,
                                           color: Colors.white,
                                         ),

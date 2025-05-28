@@ -19,7 +19,6 @@ class PembayaranModel {
     return PembayaranModel(
       id: json['id'],
       siswaId: json['siswaId'] ?? '',
-
       buktiPembayaranUrl: json['buktiPembayaranUrl'],
       tanggalPembayaran: (json['tanggalPembayaran'] as Timestamp).toDate(),
       status: json['status'],

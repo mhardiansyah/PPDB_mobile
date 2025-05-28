@@ -19,13 +19,19 @@ import 'package:ppdb_be/presentation/page/test/test_screen.dart';
 part 'Route_name.dart';
 
 final appRoute = [
+  // GoRoute(
+  //   path: '/home',
+  //   name: Routes.home,
+  //   builder: (context, state) {
+  //     final pembayaran = state.extra as PembayaranModel?;
+  //     print("Extra di terima di router: $pembayaran");
+  //     return HomeScreen(pembayaran: pembayaran);
+  //   },
+  // ),
   GoRoute(
     path: '/home',
     name: Routes.home,
-    builder: (context, state) {
-      final pembayaran = state.extra as PembayaranModel?;
-      return HomeScreen(pembayaran: pembayaran);
-    },
+    builder: (context, state) => const HomeScreen(),
   ),
   GoRoute(
     path: '/splash',
@@ -92,6 +98,18 @@ final appRoute = [
       return TestScreen(kategori: kategori);
     },
   ),
+
+  // GoRoute(
+  //   path: '/test_screen',
+  //   name: Routes.test_screen,
+  //   builder: (context, state) {
+  //     final extra = state.extra as Map<String, dynamic>;
+  //     final kategori = extra['item'] as kategorisoalModel;
+  //     final siswa = extra['siswa'] as SiswaModel;
+
+  //     return TestScreen(kategori: kategori, siswa: siswa);
+  //   },
+  // ),
   GoRoute(
     name: Routes.hasil_test,
     path: '/hasil-test',
@@ -106,6 +124,7 @@ final appRoute = [
     path: '/pembayaran',
     builder: (context, state) {
       final siswa = state.extra as SiswaModel;
+
       return PembayaranScreen(siswa: siswa);
     },
   ),

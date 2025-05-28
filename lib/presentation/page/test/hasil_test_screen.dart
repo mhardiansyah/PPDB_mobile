@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:ppdb_be/core/models/daftar_test.dart';
+import 'package:ppdb_be/core/router/App_router.dart';
 
 class HasilTestScreen extends StatelessWidget {
   final Map<String, dynamic> extra;
@@ -13,14 +16,32 @@ class HasilTestScreen extends StatelessWidget {
     final skor = extra['skor'] as int;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Hasil Test')),
+      appBar: AppBar(
+        title: Text(
+          'Hasil Test',
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Text(
-              'Skor Anda: $skor  / 100 ',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => context.goNamed(Routes.daftar_test),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'Skor Anda: $skor  / 100 ',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             Expanded(

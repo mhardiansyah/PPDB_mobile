@@ -44,38 +44,49 @@ class PembayaranService {
   }
 
   Future tambahPembayaran({
-  required String siswaId,
-  required String metodePembayaran,
-  required int jumlah,
-  Uint8List? buktiBayarBytes,
-}) async {
-  try {
-    String? buktiPembayaranUrl;
+    String? id,
+    required String siswaId,
+    required String metodePembayaran,
+    required int jumlah,
+    Uint8List? buktiBayarBytes,
+  }) async {
+    try {
+      String? buktiPembayaranUrl;
 
-    if (buktiBayarBytes != null) {
-      buktiPembayaranUrl = await uploadBuktiPembayaran(buktiBayarBytes);
+      if (buktiBayarBytes != null) {
+        buktiPembayaranUrl = await uploadBuktiPembayaran(buktiBayarBytes);
+      }
+
+      final pembayaran = PembayaranModel(
+        id: id,
+        siswaId: siswaId,
+        buktiPembayaranUrl: buktiPembayaranUrl,
+        tanggalPembayaran: DateTime.now(),
+        status: 'sudah bayar',
+      );
+
+      await _pembayaranCollection.add(pembayaran.toJson());
+      print("Pembayaran berhasil ditambahkan");
+    } catch (e) {
+      print("Error tambah pembayaran: $e");
     }
-
-    final pembayaran = PembayaranModel(
-      siswaId: siswaId,
-      buktiPembayaranUrl: buktiPembayaranUrl,
-      tanggalPembayaran: DateTime.now(),
-      status: 'sudah bayar',
-    );
-
-    await _pembayaranCollection.add(pembayaran.toJson());
-    print("Pembayaran berhasil ditambahkan");
-  } catch (e) {
-    print("Error tambah pembayaran: $e");
   }
-}
 
+  Stream<PembayaranModel?> getPembayaranBySiswaId(String siswaId) {
+    print("Mencari pembayaran untuk siswaId: $siswaId");
 
-  Stream<List<PembayaranModel>> getPembayaranBySiswaId(String siswaId) {
     return _pembayaranCollection
         .where('siswaId', isEqualTo: siswaId)
-        .orderBy('tanggalPembayaran', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => PembayaranModel.fromJson(doc.data())).toList());
+        .map((snapshot) {
+          print("Jumlah dokumen ditemukan: ${snapshot.docs.length}");
+          if (snapshot.docs.isNotEmpty) {
+            final data = snapshot.docs.first.data();
+            print("Data dokumen: $data");
+            return PembayaranModel.fromJson(data);
+          } else {
+            return null;
+          }
+        });
   }
 }

@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ppdb_be/core/models/daftar_test.dart';
+import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
 import 'package:ppdb_be/service/hasil_test_service.dart';
 import 'package:ppdb_be/service/soal_service.dart';
 
 class TestScreen extends StatefulWidget {
   final kategorisoalModel kategori;
+  // final SiswaModel siswa;
   const TestScreen({super.key, required this.kategori});
 
   @override
@@ -211,6 +213,7 @@ class _TestScreenState extends State<TestScreen> {
                             final hasilService = HasilTestService();
                             await hasilService.simpanHasilTest(
                               userId: userId.toString(),
+                              // namaSiswa: widget.siswa.nama,
                               namaPelajaran: widget.kategori.nama_pelajaran,
                               jawaban: jawabanDetail,
                               skor: hasilSkor,
