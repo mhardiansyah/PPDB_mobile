@@ -15,7 +15,8 @@ import 'package:ppdb_be/widgets/notif_failed.dart';
 import 'package:ppdb_be/widgets/notif_succes.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final PembayaranModel? pembayaran;
+  const HomeScreen({super.key, required this.pembayaran});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -36,6 +37,11 @@ class _HomeScreenState extends State<HomeScreen> {
       cekPendaftaran(user.uid);
       cekberkas(user.uid);
     }
+    // PembayaranModel? pembayaransiswa = widget.pembayaran;
+    // if (pembayaransiswa != null) {
+    //   print("pembayaran: $pembayaransiswa.siswaId");
+    //   // cekPembayaran(pembayaran);
+    // }
   }
 
   void cekPendaftaran(String uid) async {
@@ -54,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (mounted) {
       if (firstData.isNotEmpty) {
-        final berkas = firstData[0]; // Ambil dokumen pertama saja
+        final berkas = firstData[0];
         setState(() {
           isSudahcomplete =
               berkas.foto3x4Url != null &&
@@ -546,6 +552,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildPengumumanContainer(BuildContext context) {
+    final PembayaranModel? pengumuman = widget.pembayaran;
     return StreamBuilder<List<SiswaModel>>(
       stream: PendaftaranService().getPendaftaranByUserId(userId!),
       builder: (context, snapshot) {
@@ -610,11 +617,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getStatusPengumumanColor(siswa.status),
+                      color: _getStatusPengumumanColor(
+                        pengumuman?.status ?? 'belum bayar',
+                      ),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      'Status: ${_getStatusPengumumanText(siswa.status)}',
+                      'Status: ${_getStatusPengumumanText(pengumuman?.status ?? 'belum bayar')}',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,

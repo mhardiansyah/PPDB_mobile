@@ -75,7 +75,6 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
         return;
       }
 
-      // Simpan data ke Firestore
       await _pembayaranService.tambahPembayaran(
         siswaId: siswaId ?? '',
         metodePembayaran: 'Transfer',
@@ -95,7 +94,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Pembayaran berhasil ditambahkan')),
       );
-      context.goNamed(Routes.home);
+      context.goNamed(Routes.home, extra: pembayaran);
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -141,7 +140,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
         leading: BackButton(
           color: Colors.white,
           onPressed: () {
-            context.goNamed(Routes.home);
+            context.goNamed(Routes.home, extra: pembayaran);
           },
         ),
         shape: const RoundedRectangleBorder(

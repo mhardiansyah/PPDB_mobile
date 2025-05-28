@@ -71,19 +71,11 @@ class PembayaranService {
 }
 
 
-  Stream<String> statusPembayaranStream(String siswaId) {
-    return FirebaseFirestore.instance
-        .collection('pembayaran_siswa')
+  Stream<List<PembayaranModel>> getPembayaranBySiswaId(String siswaId) {
+    return _pembayaranCollection
         .where('siswaId', isEqualTo: siswaId)
         .orderBy('tanggalPembayaran', descending: true)
-        .limit(1)
         .snapshots()
-        .map((snapshot) {
-          if (snapshot.docs.isNotEmpty) {
-            final data = snapshot.docs.first.data();
-            return (data['status'] ?? 'belum bayar') as String;
-          }
-          return 'belum bayar';
-        });
+        .map((snapshot) => snapshot.docs.map((doc) => PembayaranModel.fromJson(doc.data())).toList());
   }
 }

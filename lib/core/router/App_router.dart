@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:ppdb_be/core/models/daftar_test.dart';
+import 'package:ppdb_be/core/models/pembayaran_model.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/presentation/page/Form_screen.dart';
 import 'package:ppdb_be/presentation/page/Pembayaran_screen.dart';
@@ -21,7 +22,10 @@ final appRoute = [
   GoRoute(
     path: '/home',
     name: Routes.home,
-    builder: (context, state) => const HomeScreen(),
+    builder: (context, state) {
+      final pembayaran = state.extra as PembayaranModel?;
+      return HomeScreen(pembayaran: pembayaran);
+    },
   ),
   GoRoute(
     path: '/splash',
@@ -96,18 +100,18 @@ final appRoute = [
       return HasilTestScreen(extra: extra);
     },
   ),
-  GoRoute(
-  name: Routes.pembayaran,
-  path: '/pembayaran',
-  builder: (context, state) {
-    final siswa = state.extra as SiswaModel;
-    return PembayaranScreen(siswa: siswa);
-  },
-),
-// GoRoute(
-//     path: '/pembayaran',
-//     name: Routes.pembayaran,
-//     builder: (context, state) => const PembayaranScreen(),
-//   ),
 
+  GoRoute(
+    name: Routes.pembayaran,
+    path: '/pembayaran',
+    builder: (context, state) {
+      final siswa = state.extra as SiswaModel;
+      return PembayaranScreen(siswa: siswa);
+    },
+  ),
+  // GoRoute(
+  //     path: '/pembayaran',
+  //     name: Routes.pembayaran,
+  //     builder: (context, state) => const PembayaranScreen(),
+  //   ),
 ];
