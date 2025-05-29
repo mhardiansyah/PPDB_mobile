@@ -1,5 +1,8 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -12,8 +15,8 @@ import 'package:ppdb_be/service/soal_service.dart';
 
 class TestScreen extends StatefulWidget {
   final kategorisoalModel kategori;
-  // final SiswaModel siswa;
-  const TestScreen({super.key, required this.kategori});
+  final SiswaModel siswa;
+  const TestScreen({super.key, required this.kategori, required this.siswa});
 
   @override
   State<TestScreen> createState() => _TestScreenState();
@@ -56,6 +59,21 @@ class _TestScreenState extends State<TestScreen> {
     });
   }
 
+  Future<String?> getPendaftaranDocId(String userId) async {
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('pendaftaran')
+            .where('siswa.userid', isEqualTo: userId)
+            .limit(1)
+            .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first.id;
+    } else {
+      return null;
+    }
+  }
+
   void fetchSoal() async {
     final soalService = SoalService();
     final data = await soalService.fetchSoalByKategori(
@@ -91,7 +109,10 @@ class _TestScreenState extends State<TestScreen> {
                           IconButton(
                             icon: const Icon(Icons.arrow_back),
                             onPressed:
-                                () => context.goNamed(Routes.daftar_test),
+                                () => context.goNamed(
+                                  Routes.daftar_test,
+                                  extra: widget.siswa,
+                                ),
                           ),
                           const SizedBox(width: 8),
                           const Text(
@@ -186,7 +207,6 @@ class _TestScreenState extends State<TestScreen> {
                           ),
                           onPressed: () async {
                             int hasilSkor = 0;
-
                             List<Map<String, dynamic>> jawabanDetail = [];
 
                             for (int i = 0; i < soalList.length; i++) {
@@ -210,25 +230,45 @@ class _TestScreenState extends State<TestScreen> {
                               });
                             }
 
+
+                            final userId =
+                                FirebaseAuth.instance.currentUser?.uid;
+
+                            if (userId == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Data pendaftaran tidak ditemukan',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+
+                            final namaSiswa = widget.siswa.nama;
+                            print("Siswa data: $namaSiswa");
+                            print("Siswa data: ${widget.siswa.nama}");
+
                             final hasilService = HasilTestService();
                             await hasilService.simpanHasilTest(
-                              userId: userId.toString(),
-                              // namaSiswa: widget.siswa.nama,
+                              userId: userId,
+                              namaSiswa: namaSiswa,
                               namaPelajaran: widget.kategori.nama_pelajaran,
                               jawaban: jawabanDetail,
                               skor: hasilSkor,
                             );
 
-                            // navigasi ke hasil_test
                             context.goNamed(
                               Routes.hasil_test,
                               extra: {
                                 'selectedAnswers': selectedAnswers,
                                 'soalList': soalList,
                                 'skor': hasilSkor,
+                                'siswa': widget.siswa,
                               },
                             );
                           },
+
                           child: const Text(
                             'Submit',
                             style: TextStyle(color: Colors.white, fontSize: 16),

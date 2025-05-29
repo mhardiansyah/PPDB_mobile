@@ -8,7 +8,8 @@ import 'package:ppdb_be/service/soal_service.dart';
 import 'package:ppdb_be/service/hasil_test_service.dart';
 
 class DaftarTestScreen extends StatefulWidget {
-  const DaftarTestScreen({super.key});
+  final SiswaModel siswa;
+  const DaftarTestScreen({super.key, required this.siswa});
 
   @override
   State<DaftarTestScreen> createState() => _DaftarTestScreenState();
@@ -28,6 +29,9 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
   void initState() {
     super.initState();
     final user = FirebaseAuth.instance.currentUser;
+    print("User ID: ${user?.uid}");
+    print("User ID: ${FirebaseAuth.instance.currentUser?.uid}");
+    siswa = widget.siswa;
     if (user != null) {
       userId = user.uid;
       fetchData();
@@ -38,6 +42,8 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
     final kategori = await _soalService.fetchKategoriSoal();
     final sudahDikerjakan = await _hasilTestService
         .getKategoriYangSudahDikerjakan(userId!);
+    print("List kategori: ${kategori.map((e) => e.nama_pelajaran)}");
+    print("Sudah dikerjakan: $sudahDikerjakan");
 
     setState(() {
       _kategoriSoalList = kategori;
@@ -199,9 +205,18 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
                                       //             },
                                       //           );
                                       //         },
-                                      onPressed: () {
-                                        context.goNamed(Routes.test_screen, extra: item);
-                                      },
+                                      onPressed:
+                                          sudahDikerjakan
+                                              ? null
+                                              : () {
+                                                context.goNamed(
+                                                  Routes.test_screen,
+                                                  extra: {
+                                                    'item': item,
+                                                    'siswa': siswa,
+                                                  },
+                                                );
+                                              },
 
                                       child: Text(
                                         sudahDikerjakan

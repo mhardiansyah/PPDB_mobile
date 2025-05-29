@@ -5,18 +5,20 @@ class HasilTestService {
   final _hasilTestCollection = FirebaseFirestore.instance.collection(
     'hasil_test',
   );
+  final CollectionReference _pendaftaranCollection = FirebaseFirestore.instance
+      .collection('pendaftaran');
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> simpanHasilTest({
     required String userId,
-    // required String namaSiswa,
+    required String namaSiswa,
     required String namaPelajaran,
     required List<Map<String, dynamic>> jawaban,
     required int skor,
   }) async {
     await _hasilTestCollection.add({
       'userId': userId,
-      // 'namaSiswa': namaSiswa,
+      'namaSiswa': namaSiswa,
       'namaPelajaran': namaPelajaran,
       'jawaban': jawaban,
       'skor': skor,
@@ -30,6 +32,7 @@ class HasilTestService {
             .where('userId', isEqualTo: userId)
             .where('namaPelajaran', isEqualTo: namaPelajaran)
             .get();
+    print("snapshot.docs.isNotEmpty: ${snapshot.docs.isNotEmpty}");
 
     return snapshot.docs.isNotEmpty;
   }
@@ -41,22 +44,29 @@ class HasilTestService {
     return snapshot.docs.map((doc) => doc['namaPelajaran'] as String).toList();
   }
 
-  Future<SiswaModel?> getSiswaByUid(String uid) async {
+  Future<SiswaModel?> getSinglePendaftaranByUserId(String userId) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('pendaftaran')
-          .where('uid', isEqualTo: uid)
-          .limit(1)
-          .get();
+      final snapshot =
+          await _pendaftaranCollection
+              .where("siswa.userid", isEqualTo: userId)
+              .limit(1)
+              .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        final data = querySnapshot.docs.first.data();
-        return SiswaModel.fromJson(data);
+      if (snapshot.docs.isNotEmpty) {
+        final data = snapshot.docs.first.data() as Map<String, dynamic>;
+        print("Dokumen pendaftaran lengkap: $data");
+        print("Isi field siswa: ${data['siswa']}");
+        if (data['siswa'] == null) {
+          print("Field 'siswa' kosong atau tidak ada.");
+          return null;
+        }
+        return SiswaModel.fromJson(data['siswa']);
       } else {
-        return null;
+        print("Dokumen pendaftaran tidak ditemukan.");
       }
+      return null;
     } catch (e) {
-      print('Error getting siswa by UID: $e');
+      print("Error getSinglePendaftaranByUserId: $e");
       return null;
     }
   }

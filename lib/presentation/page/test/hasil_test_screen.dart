@@ -2,18 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ppdb_be/core/models/daftar_test.dart';
+import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
 
-class HasilTestScreen extends StatelessWidget {
+class HasilTestScreen extends StatefulWidget {
   final Map<String, dynamic> extra;
 
-  const HasilTestScreen({super.key, required this.extra});
+  const HasilTestScreen({super.key, required this.extra, });
 
   @override
+  State<HasilTestScreen> createState() => _HasilTestScreenState();
+}
+
+class _HasilTestScreenState extends State<HasilTestScreen> {
+  @override
   Widget build(BuildContext context) {
-    final selectedAnswers = extra['selectedAnswers'] as Map<int, int>;
-    final soalList = extra['soalList'] as List<SoalTest>;
-    final skor = extra['skor'] as int;
+    final selectedAnswers = widget.extra['selectedAnswers'] as Map<int, int>;
+    final soalList = widget.extra['soalList'] as List<SoalTest>;
+    final skor = widget.extra['skor'] as int;
+    final siswa = widget.extra['siswa'] as SiswaModel;
 
     return Scaffold(
       appBar: AppBar(
@@ -31,7 +38,8 @@ class HasilTestScreen extends StatelessWidget {
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back),
-                  onPressed: () => context.goNamed(Routes.daftar_test),
+                  onPressed:
+                      () => context.goNamed(Routes.daftar_test, extra: siswa),
                 ),
                 SizedBox(width: 10),
                 Text(

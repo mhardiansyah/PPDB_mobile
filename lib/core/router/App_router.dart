@@ -80,7 +80,10 @@ final appRoute = [
   GoRoute(
     path: '/daftar_test',
     name: Routes.daftar_test,
-    builder: (context, state) => const DaftarTestScreen(),
+    builder: (context, state) {
+      final siswa = state.extra as SiswaModel;
+      return DaftarTestScreen(siswa: siswa);
+    },
   ),
   GoRoute(
     path: '/test_diniah',
@@ -90,26 +93,27 @@ final appRoute = [
       return TestDiniahScreen(kategori: kategori);
     },
   ),
-  GoRoute(
-    path: '/test_screen',
-    name: Routes.test_screen,
-    builder: (context, state) {
-      final kategori = state.extra as kategorisoalModel;
-      return TestScreen(kategori: kategori);
-    },
-  ),
 
   // GoRoute(
   //   path: '/test_screen',
   //   name: Routes.test_screen,
   //   builder: (context, state) {
-  //     final extra = state.extra as Map<String, dynamic>;
-  //     final kategori = extra['item'] as kategorisoalModel;
-  //     final siswa = extra['siswa'] as SiswaModel;
-
-  //     return TestScreen(kategori: kategori, siswa: siswa);
+  //     final kategori = state.extra as kategorisoalModel;
+  //     final siswa = state.extra as SiswaModel;
+  //     return TestScreen(kategori: kategori, siswa: siswa,);
   //   },
   // ),
+  GoRoute(
+    path: '/test_screen',
+    name: Routes.test_screen,
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>;
+      final kategori = extra['item'] as kategorisoalModel;
+      final siswa = extra['siswa'] as SiswaModel;
+
+      return TestScreen(kategori: kategori, siswa: siswa);
+    },
+  ),
   GoRoute(
     name: Routes.hasil_test,
     path: '/hasil-test',
@@ -124,13 +128,7 @@ final appRoute = [
     path: '/pembayaran',
     builder: (context, state) {
       final siswa = state.extra as SiswaModel;
-
       return PembayaranScreen(siswa: siswa);
     },
   ),
-  // GoRoute(
-  //     path: '/pembayaran',
-  //     name: Routes.pembayaran,
-  //     builder: (context, state) => const PembayaranScreen(),
-  //   ),
 ];

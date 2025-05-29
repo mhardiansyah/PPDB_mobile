@@ -48,6 +48,7 @@ class kategorisoalModel {
   final String image_url;
 
   String? userid;
+  String? siswaId;
 
   kategorisoalModel({
     required this.nama_pelajaran,

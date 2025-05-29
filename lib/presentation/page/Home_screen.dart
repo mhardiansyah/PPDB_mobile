@@ -435,11 +435,11 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (status) {
       case 'pending':
         return Colors.orange;
-      case 'berkas diterima':
+      case 'complete':
         return Colors.orangeAccent;
       case 'verifikasi':
         return Colors.blue;
-      case 'diterima':
+      case 'accepted':
         return Colors.green;
       case 'ditolak':
         return Colors.red;
@@ -452,11 +452,11 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (status) {
       case 'pending':
         return 'Pending';
-      case 'berkas diterima':
+      case 'complete':
         return 'berkas diterima';
       case 'verifikasi':
         return 'Sedang Diverifikasi';
-      case 'diterima':
+      case 'accepted':
         return 'Diterima';
       case 'ditolak':
         return 'Ditolak';
@@ -679,7 +679,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (!isSudahbayar) {
                             context.goNamed(Routes.pembayaran, extra: siswa);
                           } else if (isSudahbayar && !isSudahTest) {
-                            context.goNamed(Routes.daftar_test);
+                            context.goNamed(Routes.daftar_test, extra: siswa);
                           } else if (isSudahbayar && isSudahTest) {
                             null;
                           }
