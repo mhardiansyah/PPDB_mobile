@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker_web/image_picker_web.dart';
 import 'package:ppdb_be/core/models/pembayaran_model.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
@@ -39,6 +41,17 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
   }
 
   Future<void> _pickImage() async {
+  if (kIsWeb) {
+    final imageBytes = await ImagePickerWeb.getImageAsBytes();
+    if (imageBytes != null) {
+      setState(() {
+        _buktiBayarBytes = imageBytes;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bukti transfer berhasil dipilih')),
+      );
+    }
+  } else {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       final bytes = await image.readAsBytes();
@@ -50,6 +63,8 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
       );
     }
   }
+}
+
 
   Future<void> _submitPembayaran() async {
     final siswaId = widget.siswa.id;
@@ -84,16 +99,6 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
         buktiBayarBytes: _buktiBayarBytes,
       );
 
-      // final newPembayaran = PembayaranModel(
-      //   siswaId: siswaId ?? '',
-      //   buktiPembayaranUrl: buktiPembayaranUrl,
-      //   tanggalPembayaran: DateTime.now(),
-      //   status: pembayaran?.status,
-      // );
-
-      // setState(() {
-      //   pembayaran = newPembayaran;
-      // });
 
       setState(() {
         pembayaran = PembayaranModel(

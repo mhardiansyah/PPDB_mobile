@@ -27,13 +27,20 @@ void setupFCM() async {
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     print('User klik notifikasi: ${message.notification?.body}');
+    final tipe = message.data['tipe'];
+    if (tipe == 'Pengumuman_lolos') {
+      navigatorKey.currentContext?.goNamed(Routes.home); // ✅ navigasi
+    }
   });
 }
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   WidgetsFlutterBinding.ensureInitialized();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  setupFCM();
   runApp(const MyApp());
 }
 
@@ -49,6 +56,7 @@ class MyApp extends StatelessWidget {
           final GoRouter customRouter = GoRouter(
             initialLocation: snapshot.data != null ? '/home' : '/splash',
             routes: appRoute,
+            navigatorKey: navigatorKey,
           );
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,

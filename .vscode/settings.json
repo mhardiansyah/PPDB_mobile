@@ -14,5 +14,6 @@
         "Skor",
         "soal",
         "tanggal"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

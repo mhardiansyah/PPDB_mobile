@@ -1,0 +1,16 @@
+@echo off
+REM Set JAVA_HOME ke JDK 17
+set JAVA_HOME=C:\Program Files\Java\jdk-17
+set PATH=%JAVA_HOME%\bin;%PATH%
+
+echo =============================================
+echo 🔧 Flutter siap dijalankan dengan JDK 17 ✅
+echo =============================================
+
+REM Masuk ke folder project Flutter kamu
+cd /d "C:\blj.steat fulll flutter\Clean architecture\e_commerce_mini"
+
+code .
+
+REM Buka terminal dalam folder tersebut
+cmd /k

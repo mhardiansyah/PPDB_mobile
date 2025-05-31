@@ -1,6 +1,8 @@
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:ppdb_be/core/models/berkas_model.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
@@ -23,59 +25,29 @@ class _FormFilesScreenState extends State<FormFilesScreen> {
   List<Uint8List?> selectedFiles = List.filled(6, null);
   List<String?> uploadedUrls = List.filled(6, null);
   bool isLoading = false;
+  final ImagePicker _picker = ImagePicker();
 
   Future pilihGambar(int index) async {
-    final image = await ImagePickerWeb.getImageAsBytes();
-    if (image != null) {
-      setState(() {
-        selectedFiles[index] = image;
-      });
+    if (kIsWeb) {
+      // Untuk web pakai image_picker_web
+      final image = await ImagePickerWeb.getImageAsBytes();
+      if (image != null) {
+        setState(() {
+          selectedFiles[index] = image;
+        });
+      }
+    } else {
+      // Untuk Android/iOS pakai image_picker biasa
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        final bytes = await pickedFile.readAsBytes();
+        setState(() {
+          selectedFiles[index] = bytes;
+        });
+      }
     }
   }
 
-  // Future _kirimBerkas() async {
-  //   if (!_formKey.currentState!.validate()) return;
-
-  //   setState(() => isLoading = true);
-
-  //   for (int i = 0; i < selectedFiles.length; i++) {
-  //     if (selectedFiles[i] != null) {
-  //       final url = await UploadService().uploadImage(selectedFiles[i]!);
-  //       uploadedUrls[i] = url;
-  //     }
-  //   }
-
-  // if (uploadedUrls.any((url) => url == null)) {
-  //   ScaffoldMessenger.of(
-  //     context,
-  //   ).showSnackBar(SnackBar(content: Text("Gagal upload salah satu berkas")));
-  //   setState(() => isLoading = false);
-  //   return;
-  // }
-
-  // if (uploadedUrls.isEmpty) {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  // }
-
-  //   final berkas = BerkasModel(
-  //     siswaId: widget.siswa.id.toString(),
-  //     foto3x4Url: uploadedUrls[0]!,
-  //     ijazahUrl: uploadedUrls[1]!,
-  //     kartuKeluargaUrl: uploadedUrls[2]!,
-  //     raporUrl: uploadedUrls[3]!,
-  //     suratKeteranganLulusUrl: uploadedUrls[4]!,
-  //     aktaKelahiranUrl: uploadedUrls[5]!,
-  //   );
-  //   await PendaftaranService().addPendaftaran(
-  //     siswa: widget.siswa,
-  //     berkas: berkas,
-  //     context: context,
-  //   );
-
-  //   setState(() => isLoading = false);
-  // }
 
   Future _kirimBerkas() async {
     setState(() => isLoading = true);

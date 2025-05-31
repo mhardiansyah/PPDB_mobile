@@ -35,27 +35,6 @@ class PendaftaranService {
     }
   }
 
-  // Future editPendaftaran(BerkasModel berkasItems, BuildContext context) async {
-  //   try {
-  //     final docRef = FirebaseFirestore.instance
-  //         .collection('pendaftaran')
-  //         .doc(berkasItems.id);
-  //     await docRef.set({
-  //       'foto3x4Url': berkasItems.foto3x4Url,
-  //       'ijazahUrl': berkasItems.ijazahUrl,
-  //       'kartuKeluargaUrl': berkasItems.kartuKeluargaUrl,
-  //       'raporUrl': berkasItems.raporUrl,
-  //       'suratKeteranganLulusUrl': berkasItems.suratKeteranganLulusUrl,
-  //       'aktaKelahiranUrl': berkasItems.aktaKelahiranUrl,
-  //       'updatedAt': DateTime.now(),
-  //     }, SetOptions(merge: true));
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(
-  //       context,
-  //     ).showSnackBar(SnackBar(content: Text('Gagal mengedit data: $e')));
-  //   }
-  // }
-
   Future updateBerkasBySiswaId(
     String siswaId,
     Map<String, dynamic> dataBerkas,

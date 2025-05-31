@@ -35,6 +35,7 @@ class _TestScreenState extends State<TestScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       userId = user.uid;
+      print("User ID di initState: $userId");
     }
     super.initState();
     startTimer();
@@ -57,21 +58,6 @@ class _TestScreenState extends State<TestScreen> {
         });
       }
     });
-  }
-
-  Future<String?> getPendaftaranDocId(String userId) async {
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection('pendaftaran')
-            .where('siswa.userid', isEqualTo: userId)
-            .limit(1)
-            .get();
-
-    if (snapshot.docs.isNotEmpty) {
-      return snapshot.docs.first.id;
-    } else {
-      return null;
-    }
   }
 
   void fetchSoal() async {
@@ -229,7 +215,6 @@ class _TestScreenState extends State<TestScreen> {
                                 'benar': isBenar,
                               });
                             }
-
 
                             final userId =
                                 FirebaseAuth.instance.currentUser?.uid;
