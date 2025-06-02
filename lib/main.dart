@@ -29,16 +29,17 @@ void setupFCM() async {
     print('User klik notifikasi: ${message.notification?.body}');
     final tipe = message.data['tipe'];
     if (tipe == 'Pengumuman_lolos') {
-      navigatorKey.currentContext?.goNamed(Routes.home); // ✅ navigasi
+      navigatorKey.currentContext?.goNamed(Routes.home); 
     }
   });
 }
 
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-Future main() async {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Pastikan ini dipanggil pertama
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  WidgetsFlutterBinding.ensureInitialized();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   setupFCM();
   runApp(const MyApp());

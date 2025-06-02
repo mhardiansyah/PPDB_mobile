@@ -10,6 +10,7 @@ import 'package:ppdb_be/core/router/App_router.dart';
 import 'package:ppdb_be/service/Pendaftaran_service.dart';
 import 'package:ppdb_be/service/auth_service.dart';
 import 'package:ppdb_be/service/pembayaran_service.dart';
+import 'package:ppdb_be/service/pembayaran_uang_masuk_service.dart';
 import 'package:ppdb_be/widgets/SiswaCard.dart';
 import 'package:ppdb_be/widgets/berkas.dart';
 import 'package:ppdb_be/widgets/notif_failed.dart';
@@ -30,8 +31,10 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isSudahDaftar = false;
   bool isSudahcomplete = false;
   bool isSudahbayar = false;
+  bool isSudahbayarUangMasuk = false;
   bool isSudahTest = false;
   bool isDiterima = false;
+  bool isDitolak = false;
   bool showPembayaranQr = false;
 
   SiswaModel? siswa;
@@ -45,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       cekberkas(user.uid);
       ceksudahTest(user.uid);
       cekDiterima(user.uid);
+      cekIsDitolak(user.uid);
     }
   }
 
@@ -60,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (firstData.isNotEmpty) {
       final siswaId = firstData[0].id;
       cekPembayaran(siswaId!);
+      cekPembayaranUangMasuk(siswaId);
     }
   }
 
@@ -103,6 +108,16 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void cekPembayaranUangMasuk(String siswaId) async {
+    final stream = PembayaranUangMasukService().getPembayaranBySiswaId(siswaId);
+    final firstData = await stream.first;
+    if (mounted) {
+      setState(() {
+        isSudahbayarUangMasuk = firstData?.status == 'sudah bayar uang masuk';
+      });
+    }
+  }
+
   void ceksudahTest(String userId) async {
     final hasilTest =
         await FirebaseFirestore.instance
@@ -118,20 +133,30 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void cekDiterima(String userId) async {
-    final stream = PendaftaranService().getPendaftaranByUserId(userId!);
+    final stream = PendaftaranService().getPendaftaranByUserId(userId);
     stream.listen((siswaList) {
-      if (siswaList.isNotEmpty) {
-        final siswa = siswaList.first;
-        print("Status Siswa: ${siswa.status}");
-        print("Siswa: ${siswa}");
-
+      if (mounted) {
         setState(() {
-          isDiterima = siswa.status == 'accepted';
-          print("isDiterima: $isDiterima");
+          if (siswaList.isNotEmpty) {
+            final siswa = siswaList.first;
+            isDiterima = siswa.status == 'accepted';
+            isDitolak = siswa.status == 'ditolak';
+          } else {
+            isDiterima = false;
+            isDitolak = false;
+          }
         });
-      } else {
+      }
+    });
+  }
+
+  void cekIsDitolak(String userId) async {
+    final stream = PendaftaranService().getPendaftaranByUserId(userId);
+    stream.listen((siswaList) {
+      if (mounted) {
         setState(() {
-          isDiterima = false;
+          isDitolak =
+              siswaList.isNotEmpty && siswaList.first.status == 'ditolak';
         });
       }
     });
@@ -228,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: const Icon(Icons.text_snippet_outlined),
               title: const Text('Test'),
               onTap: () {
-                context.goNamed(Routes.daftar_test);
+                context.goNamed(Routes.daftar_test, extra: siswa);
               },
             ),
             ListTile(
@@ -257,7 +282,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           'assets/images/bgHome.png',
                           fit: BoxFit.cover,
                           width: MediaQuery.of(context).size.width * 1.5,
-                          height: double.infinity,
                         ),
                       ),
                       Center(
@@ -401,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisCount: 3,
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              mainAxisSpacing: 12,
+                              mainAxisSpacing: 10,
                               crossAxisSpacing: 12,
 
                               children: [
@@ -612,9 +636,16 @@ class _HomeScreenState extends State<HomeScreen> {
             if (isDiterima) {
               pesan1 =
                   'Berdasarkan hasil pemeriksaan Test, calon santri atas nama ${siswa.nama} dinyatakan';
-              pesan2 = isDiterima ? 'Lulus' : 'Tidak Lulus';
-              pesan3 = 'Silahkan untuk melanjutkan Pembyaran uang masuk';
+              pesan2 = 'Lulus';
+              pesan3 = 'Silahkan untuk melanjutkan Pembayaran uang masuk';
               pesan4 = 'Silahkan lanjutkan pembayaran';
+              warnabtn = Color(0xFFFCAA09);
+            } else if (isDitolak) {
+              pesan1 =
+                  'Berdasarkan hasil pemeriksaan Test, calon santri atas nama ${siswa.nama} dinyatakan';
+              pesan2 = 'Tidak Lulus';
+              pesan3 = 'Silahkan untuk coba lagi di tahun depan';
+              pesan4 = '';
               warnabtn = Color(0xFFFCAA09);
             } else if (!isSudahbayar) {
               pesan1 =
@@ -635,16 +666,23 @@ class _HomeScreenState extends State<HomeScreen> {
             } else if (isSudahbayar && isSudahTest) {
               pesan1 =
                   'Silahkan tunggu untuk informasi lebih lanjut tentang hasil ujian seleksi masuk SMK KREATIF NUSANTARA Tahun Pelajaran 2024/2025.';
+              pesan2 = 'Selamat menjadi siswa baru di SMK KREATIF NUSANTARA';
+              pesan3 = 'Done';
+              pesan4 = '';
+              warnabtn = Color(0xFF278550);
+            } else if (isSudahbayarUangMasuk) {
+              pesan1 =
+                  'selamat anda sudah membayar uang masuk, siswa dengan nama: ${siswa.nama} telah diterima di SMK KREATIF NUSANTARA';
               pesan2 =
                   'Terima kasih telah mengikuti PPDB SMK KREATIF NUSANTARA';
               pesan3 = 'Done';
               pesan4 = '';
               warnabtn = Color(0xFF278550);
             } else {
-              pesan1 = "";
-              pesan2 = "";
-              pesan3 = "";
-              pesan4 = "";
+              pesan1 = 'Status pendaftaran tidak diketahui.';
+              pesan2 = '';
+              pesan3 = '';
+              pesan4 = '';
               warnabtn = Colors.grey;
             }
 
@@ -660,245 +698,242 @@ class _HomeScreenState extends State<HomeScreen> {
                 print("Status Pembayaran: ${pembayaran?.status}");
                 print("User ID: $userId");
                 print("Show Pembayaran: ${showPembayaranQr}");
-
-                return showPembayaranQr
-                    ? Container(
-                      width: 416,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF278550),
-                        borderRadius: BorderRadius.circular(20),
+                return Container(
+                  width: 416,
+                  margin: EdgeInsets.only(bottom: 20),
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF278550),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 6,
+                        offset: Offset(0, 3),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Pembayaran Uang masuk",
-                            style: TextStyle(
-                              color: Colors.white,
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Pengumuman PPDB SMK KREATIF NUSANTARA Tahun Pelajaran\n 2024/2025',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 40),
+                      if (isDiterima) ...[
+                        Text(
+                          pesan1,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+
+                        SizedBox(height: 20),
+                        Center(
+                          child: Text(
+                            pesan2,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: 24,
+                              color: Color(0xFFFCAA09),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          _buildDetail("Nama", siswa.nama ?? "-"),
-                          _buildDetail("Jurusan", siswa.jurusan ?? "-"),
-                          _buildDetail(
-                            "Asal Sekolah",
-                            siswa.asalSekolah ?? "-",
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          pesan3,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
                           ),
-                          _buildDetail("Nominal", "4.000.000"),
-                          _buildDetail("No VA", "589678267365"),
-                          const SizedBox(height: 40),
-                          Center(
-                            child: QrImageView(
-                              data: "589678267365",
-                              size: 200,
-                              backgroundColor: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Center(
-                            child: ElevatedButton(
-                              onPressed: () {},
+                        ),
+                        SizedBox(height: 80),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                if (isDiterima) {
+                                  context.goNamed(
+                                    Routes.pembayaran,
+                                    extra: siswa,
+                                  );
+                                } else if (!isSudahbayar) {
+                                  context.goNamed(
+                                    Routes.pembayaran,
+                                    extra: siswa,
+                                  );
+                                } else if (isSudahbayar && !isSudahTest) {
+                                  context.goNamed(
+                                    Routes.daftar_test,
+                                    extra: siswa,
+                                  );
+                                } else if (isSudahbayar && isSudahTest) {
+                                  null;
+                                  print("ada masalah");
+                                }
+                              },
+
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                              ),
-                              child: Text(
-                                "lakukan pembayaran",
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+                                backgroundColor: warnabtn,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                    : Container(
-                      width: 416,
-                      margin: EdgeInsets.only(bottom: 20),
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF278550),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 6,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Pengumuman PPDB SMK KREATIF NUSANTARA\nTahun Pelajaran 2024/2025',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 40),
-                          if (isDiterima) ...[
-                            Text(
-                              pesan1,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
-                            ),
-
-                            SizedBox(height: 20),
-                            Center(
                               child: Text(
-                                pesan2,
-                                textAlign: TextAlign.center,
+                                pesan4,
                                 style: GoogleFonts.poppins(
-                                  fontSize: 24,
-                                  color: Color(0xFFFCAA09),
+                                  fontSize: 12,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-                            SizedBox(height: 20),
-                            Text(
-                              pesan3,
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
+                          ],
+                        ),
+                      ] else if (isDitolak) ...[
+                        Text(
+                          pesan1,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+
+                        SizedBox(height: 20),
+                        Center(
+                          child: Text(
+                            pesan2,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: 24,
+                              color: Color(0xFFFCAA09),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          pesan3,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: 80),
+                      ] else if (isSudahbayarUangMasuk) ...[
+                        Text(
+                          pesan1,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+
+                        SizedBox(height: 20),
+                        Center(
+                          child: Text(
+                            pesan2,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: 24,
+                              color: Color(0xFFFCAA09),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          pesan3,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: 80),
+                      ] else ...[
+                        Text(
+                          pesan1,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        ),
+
+                        SizedBox(height: 80),
+                        Text(
+                          pesan2,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        ),
+                        SizedBox(height: 80),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _getStatusPengumumanColor(
+                                  pembayaran?.status,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                'Status: ${_getStatusPengumumanText(pembayaran?.status)}',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                            SizedBox(height: 80),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    if (isDiterima) {
-                                      setState(() {
-                                        showPembayaranQr = true;
-                                      });
-                                    } else if (!isSudahbayar) {
-                                      context.goNamed(
-                                        Routes.pembayaran,
-                                        extra: siswa,
-                                      );
-                                    } else if (isSudahbayar && !isSudahTest) {
-                                      context.goNamed(
-                                        Routes.daftar_test,
-                                        extra: siswa,
-                                      );
-                                    } else if (isSudahbayar && isSudahTest) {
-                                      null;
-                                      print("ada masalah");
-                                    }
-                                  },
+                            ElevatedButton(
+                              onPressed: () {
+                                if (!isSudahbayar) {
+                                  context.goNamed(
+                                    Routes.pembayaran,
+                                    extra: siswa,
+                                  );
+                                } else if (isSudahbayar && !isSudahTest) {
+                                  context.goNamed(
+                                    Routes.daftar_test,
+                                    extra: siswa,
+                                  );
+                                } else if (isSudahbayar && isSudahTest) {
+                                  null;
+                                }
+                              },
 
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: warnabtn,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    pesan4,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: warnabtn,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ],
-                            ),
-                          ] else ...[
-                            Text(
-                              pesan1,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
                               ),
-                            ),
-
-                            SizedBox(height: 80),
-                            Text(
-                              pesan2,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
+                              child: Text(
+                                pesan3,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 80),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: _getStatusPengumumanColor(
-                                      pembayaran?.status,
-                                    ),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    'Status: ${_getStatusPengumumanText(pembayaran?.status)}',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    if (!isSudahbayar) {
-                                      context.goNamed(
-                                        Routes.pembayaran,
-                                        extra: siswa,
-                                      );
-                                    } else if (isSudahbayar && !isSudahTest) {
-                                      context.goNamed(
-                                        Routes.daftar_test,
-                                        extra: siswa,
-                                      );
-                                    } else if (isSudahbayar && isSudahTest) {
-                                      null;
-                                    }
-                                  },
-
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: warnabtn,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    pesan3,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
                             ),
                           ],
-                        ],
-                      ),
-                    );
+                        ),
+                      ],
+                    ],
+                  ),
+                );
               },
             );
           },
@@ -1006,9 +1041,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget buildFeatureCard(String title, String imagePath) {
     return SizedBox(
-      width: 100,
+      width: 120,
       child: Container(
-        padding: EdgeInsets.all(12),
+        padding: EdgeInsets.only(top: 10, bottom: 6, left: 8, right: 8),
         decoration: BoxDecoration(
           border: Border.all(color: Color(0xFF278550)),
           borderRadius: BorderRadius.circular(12),
@@ -1017,10 +1052,10 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Image.asset(imagePath, height: 48, fit: BoxFit.contain),
-            const SizedBox(height: 8),
+            const SizedBox(height: 7),
             Text(
               title,
-              style: TextStyle(fontSize: 12, color: Colors.indigo[900]),
+              style: TextStyle(fontSize: 10, color: Colors.indigo[900]),
               textAlign: TextAlign.center,
             ),
           ],

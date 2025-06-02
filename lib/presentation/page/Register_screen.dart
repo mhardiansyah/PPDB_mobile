@@ -21,7 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/background.png'),
+            image: AssetImage('assets/images/Background.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -110,33 +110,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ],
               ),
               ElevatedButton(
-                  onPressed: () {
-                    print("Login");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                onPressed: () {
+                  print("Login");
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset('assets/icons/google.png'),
-                          const SizedBox(width: 10),
-                          Text(
-                            'Sign In with google ',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset('assets/icons/google.png'),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Sign In with google ',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
                     ),
                   ),
                 ),
+              ),
             ],
           ),
         ),

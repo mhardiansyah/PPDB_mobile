@@ -1,15 +1,16 @@
 import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image_picker_web/image_picker_web.dart';
 import 'package:ppdb_be/core/models/berkas_model.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
 import 'package:ppdb_be/service/Pendaftaran_service.dart';
 import 'package:ppdb_be/service/upload_service.dart';
+import 'package:ppdb_be/utils/image_picker_mobile.dart';
+import 'package:ppdb_be/utils/image_picker_web.dart'
+ if (dart.library.io) 
+ 'package:ppdb_be/utils/image_picker_mobile.dart';
 import 'package:ppdb_be/widgets/notif_failed.dart';
 import 'package:ppdb_be/widgets/notif_succes.dart';
 
@@ -23,31 +24,23 @@ class EditFilesScreen extends StatefulWidget {
 }
 
 class _EditFilesScreenState extends State<EditFilesScreen> {
-  @override
   final _formKey = GlobalKey<FormState>();
   List<Uint8List?> selectedFiles = List.filled(6, null);
   List<String?> uploadedUrls = List.filled(6, null);
   bool isLoading = false;
-  final ImagePicker _picker = ImagePicker();
 
   Future pilihGambar(int index) async {
+    Uint8List? image;
     if (kIsWeb) {
-      // Untuk web pakai image_picker_web
-      final image = await ImagePickerWeb.getImageAsBytes();
-      if (image != null) {
-        setState(() {
-          selectedFiles[index] = image;
-        });
-      }
+      // image = await pickImageWeb();
     } else {
-      // Untuk Android/iOS pakai image_picker biasa
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-      if (pickedFile != null) {
-        final bytes = await pickedFile.readAsBytes();
-        setState(() {
-          selectedFiles[index] = bytes;
-        });
-      }
+      image = await pickImageMobile();
+    }
+
+    if (image != null) {
+      setState(() {
+        selectedFiles[index] = image;
+      });
     }
   }
 
@@ -98,6 +91,7 @@ class _EditFilesScreenState extends State<EditFilesScreen> {
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     final fileLabels = [
       "Upload Foto 3x4",
@@ -107,6 +101,7 @@ class _EditFilesScreenState extends State<EditFilesScreen> {
       "Upload Surat Keterangan Lulus",
       "Upload Akta Kelahiran",
     ];
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF226D3D),

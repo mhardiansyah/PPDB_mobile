@@ -50,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   Image.asset('assets/icons/logoBaru.png', width: 200),
                   const SizedBox(height: 60),
                   Lottie.asset(
-                    'animations/splash.json',
+                    'assets/animations/splash.json',
                     width: 250,
                     height: 250,
                     repeat: true,

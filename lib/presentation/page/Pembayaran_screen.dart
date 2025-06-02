@@ -3,13 +3,15 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker_web/image_picker_web.dart';
 import 'package:ppdb_be/core/models/pembayaran_model.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ppdb_be/service/pembayaran_service.dart';
+import 'package:ppdb_be/service/pembayaran_uang_masuk_service.dart';
+import 'package:ppdb_be/utils/image_picker_mobile.dart';
+import 'package:ppdb_be/utils/image_picker_web.dart'
+    if (dart.library.io) 'package:ppdb_be/utils/image_picker_mobile.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:uuid/uuid.dart';
 
@@ -41,8 +43,13 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
   }
 
   Future<void> _pickImage() async {
-  if (kIsWeb) {
-    final imageBytes = await ImagePickerWeb.getImageAsBytes();
+    Uint8List? imageBytes;
+    if (kIsWeb) {
+      // imageBytes = await pickImageWeb();
+    } else {
+      imageBytes = await pickImageMobile();
+    }
+
     if (imageBytes != null) {
       setState(() {
         _buktiBayarBytes = imageBytes;
@@ -50,25 +57,19 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Bukti transfer berhasil dipilih')),
       );
-    }
-  } else {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      final bytes = await image.readAsBytes();
-      setState(() {
-        _buktiBayarBytes = bytes;
-      });
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bukti transfer berhasil dipilih')),
+        const SnackBar(content: Text('Gagal memilih bukti transfer')),
       );
     }
   }
-}
-
 
   Future<void> _submitPembayaran() async {
     final siswaId = widget.siswa.id;
+    final isDiterima =
+        widget.siswa.status == 'accepted'; // Periksa status siswa
     print("siswaId: $siswaId");
+    print("isDiterima: $isDiterima");
 
     if (_buktiBayarBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -80,7 +81,13 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
     }
 
     try {
-      final buktiPembayaranUrl = await _pembayaranService.uploadBuktiPembayaran(
+      // Pilih service berdasarkan nilai isDiterima
+      final dynamic service =
+          isDiterima
+              ? PembayaranUangMasukService() // Gunakan service pembayaran uang masuk
+              : PembayaranService(); // Gunakan service pembayaran tes
+
+      final buktiPembayaranUrl = await service.uploadBuktiPembayaran(
         _buktiBayarBytes!,
       );
 
@@ -91,14 +98,13 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
         return;
       }
 
-      await _pembayaranService.tambahPembayaran(
+      await service.tambahPembayaran(
         id: const Uuid().v4(),
         siswaId: siswaId ?? '',
         metodePembayaran: 'Transfer',
-        jumlah: 250000,
+        jumlah: isDiterima ? 4000000 : 250000, // Nominal berdasarkan status
         buktiBayarBytes: _buktiBayarBytes,
       );
-
 
       setState(() {
         pembayaran = PembayaranModel(
@@ -106,7 +112,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
           siswaId: siswaId ?? '',
           buktiPembayaranUrl: buktiPembayaranUrl,
           tanggalPembayaran: DateTime.now(),
-          status: 'sudah bayar',
+          status: isDiterima ? 'sudah bayar Uang masuk' : 'sudah bayar Uang tes',
         );
       });
 
@@ -125,6 +131,12 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDiterima = widget.siswa.status == 'accepted';
+    print("Status Siswa: ${widget.siswa.status}");
+    print("isDiterima: $isDiterima");
+    print(
+      "Tampilan: ${isDiterima ? 'Pembayaran Uang Masuk' : 'Pembayaran Uang Tes'}",
+    );
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF278550),
@@ -204,15 +216,20 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Pembayaran uang Test",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  Text(
+                    isDiterima
+                        ? "Pembayaran Uang Masuk"
+                        : "Pembayaran Uang Tes",
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   const SizedBox(height: 16),
-                  buildRow("Nama", "VALENT PRAKASA ADITYAMOKO"),
-                  buildRow("Jurusan", "RPL (Rekayasa Perangkat Lunak)"),
-                  buildRow("Nominal Pembayaran", "RP 250.000"),
-                  buildRow("No Va", "589678267365"),
+                  buildRow("Nama", widget.siswa.nama ?? "-"),
+                  buildRow("Jurusan", widget.siswa.jurusan ?? "-"),
+                  buildRow(
+                    "Nominal Pembayaran",
+                    isDiterima ? "RP 4.000.000" : "RP 250.000",
+                  ),
+                  buildRow("No VA", "589678267365"),
                   const SizedBox(height: 24),
                   Center(
                     child: QrImageView(
@@ -231,7 +248,10 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
                             side: const BorderSide(color: Colors.white),
                           ),
                           onPressed: () => _pickImage(),
-                          child: const Text("upload bukti Transfer"),
+                          child: const Text(
+                            "Upload Bukti Transfer",
+                            style: TextStyle(color: Colors.white, fontSize: 10),
+                          ),
                         ),
                       ),
                       if (_buktiBayarBytes != null)
@@ -279,6 +299,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
   }
 
   Widget buildRow(String title, String value) {
+    print("buildRow - $title: $value");
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(

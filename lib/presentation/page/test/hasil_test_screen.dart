@@ -8,7 +8,7 @@ import 'package:ppdb_be/core/router/App_router.dart';
 class HasilTestScreen extends StatefulWidget {
   final Map<String, dynamic> extra;
 
-  const HasilTestScreen({super.key, required this.extra, });
+  const HasilTestScreen({super.key, required this.extra});
 
   @override
   State<HasilTestScreen> createState() => _HasilTestScreenState();
@@ -63,20 +63,62 @@ class _HasilTestScreenState extends State<HasilTestScreen> {
                       soal.opsiJawaban[userAnswer] == soal.jawabanBenar;
 
                   return Card(
-                    child: ListTile(
-                      title: Text('${index + 1}. ${soal.pertanyaan}'),
-                      subtitle: Column(
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 4,
+                    ),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Jawaban Anda: ${userAnswer != null ? soal.opsiJawaban[userAnswer] : 'Tidak dijawab'}',
-                          ),
-                          Text('Jawaban Benar: ${soal.jawabanBenar}'),
-                          Text(
-                            benar ? '✅ Benar' : '❌ Salah',
-                            style: TextStyle(
-                              color: benar ? Colors.green : Colors.red,
+                            '${index + 1}. ${soal.pertanyaan}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Jawaban Anda: ${userAnswer != null ? soal.opsiJawaban[userAnswer] : 'Tidak dijawab'}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color:
+                                  userAnswer != null
+                                      ? Colors.black
+                                      : Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Jawaban Benar: ${soal.jawabanBenar}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.blue,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                benar ? Icons.check_circle : Icons.cancel,
+                                color: benar ? Colors.green : Colors.red,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                benar ? 'Benar' : 'Salah',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: benar ? Colors.green : Colors.red,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
