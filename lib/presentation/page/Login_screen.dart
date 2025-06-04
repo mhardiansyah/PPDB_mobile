@@ -13,8 +13,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
-  bool? selectedIndex = false;
-  bool _obscureText = true; // Untuk mengontrol visibilitas password
+  bool _obscureText = true;
 
   void togglePasswordVisibility() {
     setState(() {
@@ -26,180 +25,168 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFf2f2f2),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/Background2.png',
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Image.asset(
+              'assets/images/Head.png',
+              height: 250,
+              width: double.infinity,
               fit: BoxFit.cover,
-              height: double.infinity,
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 30),
 
-          // Isi konten login
-          SingleChildScrollView(
-            padding: const EdgeInsets.only(
-              top: 100,
-              bottom: 20,
-              left: 20,
-              right: 20,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'Login',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black, // Agar terlihat di atas background
-                  ),
-                ),
-                SizedBox(height: 40),
-                TextField(
-                  controller: email,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.green),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    labelText: 'Email/NISN',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  controller: password,
-                  obscureText: _obscureText,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.green),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    labelText: 'Password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                  TextField(
+                    controller: email,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.green),
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      onPressed: togglePasswordVisibility,
+                      labelText: 'Email',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Checkbox(value: false, onChanged: (value) {}),
-                        Text(
-                          'Remember me',
-                          style: TextStyle(color: Colors.black),
+                  const SizedBox(height: 20),
+
+                  // Password Field
+                  TextField(
+                    controller: password,
+                    obscureText: _obscureText,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.green),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      labelText: 'Password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
-                      ],
+                        onPressed: togglePasswordVisibility,
+                      ),
                     ),
-                    InkWell(
-                      onTap: () => context.goNamed(Routes.forgot_password),
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0x4D81E7),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Login Button
+                  ElevatedButton(
+                    onPressed: () {
+                      AuthService().login(context, email.text, password.text);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: Center(
+                        child: Text(
+                          'Login',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ),
                     ),
-                  ],
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => context.push(Routes.register),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.black),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
                   ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: Center(
-                      child: Text(
-                        'Create Account',
-                        style: TextStyle(color: Colors.black),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.goNamed(Routes.register);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: Center(
+                        child: Text(
+                          'Register',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () {
-                    print("Login");
-                    AuthService().login(context, email.text, password.text);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                  const SizedBox(height: 20),
+
+                  // Divider with text
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(color: Colors.grey, thickness: 1),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          'Or login with',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(color: Colors.grey, thickness: 1),
+                      ),
+                    ],
                   ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: Center(
-                      child: Text(
-                        'Sign In ',
-                        style: TextStyle(color: Colors.black),
+                  const SizedBox(height: 20),
+
+                  // Google Sign-In Button
+                  ElevatedButton(
+                    onPressed: () {
+                      AuthService().sign_with_google(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(color: Colors.black),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () {
-                    print("Login");
-                    AuthService().sign_with_google(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(color: Colors.black),
-                    ),
-                  ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: Center(
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset('assets/icons/google.png'),
+                          Image.asset(
+                            'assets/icons/google.png', // Ganti dengan path ikon Google Anda
+                            height: 24,
+                          ),
                           const SizedBox(width: 10),
                           Text(
-                            'Sign In with google ',
-                            style: TextStyle(color: Colors.black),
+                            'Continue with Google',
+                            style: TextStyle(color: Colors.black, fontSize: 16),
                           ),
                         ],
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 30),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

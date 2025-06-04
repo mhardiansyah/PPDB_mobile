@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 import 'package:ppdb_be/core/models/daftar_test.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
@@ -29,6 +30,7 @@ class _TestScreenState extends State<TestScreen> {
   List<SoalTest> soalList = [];
   final Map<int, int> selectedAnswers = {};
   bool isLoading = true;
+  bool isSubmit = false;
 
   @override
   void initState() {
@@ -87,7 +89,14 @@ class _TestScreenState extends State<TestScreen> {
           padding: const EdgeInsets.all(12),
           child:
               isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? Center(
+                    child: Lottie.asset(
+                      'assets/animations/loadingHome.json',
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  )
                   : Column(
                     children: [
                       Row(
@@ -191,73 +200,96 @@ class _TestScreenState extends State<TestScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          onPressed: () async {
-                            int hasilSkor = 0;
-                            List<Map<String, dynamic>> jawabanDetail = [];
+                          onPressed:
+                              isSubmit
+                                  ? null
+                                  : () async {
+                                    setState(() {
+                                      isSubmit = true;
+                                    });
+                                    int hasilSkor = 0;
+                                    List<Map<String, dynamic>> jawabanDetail =
+                                        [];
 
-                            for (int i = 0; i < soalList.length; i++) {
-                              final soal = soalList[i];
-                              final selected = selectedAnswers[i];
-                              final isBenar =
-                                  selected != null &&
-                                  soal.opsiJawaban[selected] ==
-                                      soal.jawabanBenar;
+                                    for (int i = 0; i < soalList.length; i++) {
+                                      final soal = soalList[i];
+                                      final selected = selectedAnswers[i];
+                                      final isBenar =
+                                          selected != null &&
+                                          soal.opsiJawaban[selected] ==
+                                              soal.jawabanBenar;
 
-                              if (isBenar) hasilSkor += 4;
+                                      if (isBenar) hasilSkor += 4;
 
-                              jawabanDetail.add({
-                                'pertanyaan': soal.pertanyaan,
-                                'jawabanUser':
-                                    selected != null
-                                        ? soal.opsiJawaban[selected]
-                                        : 'Kosong',
-                                'jawabanBenar': soal.jawabanBenar,
-                                'benar': isBenar,
-                              });
-                            }
+                                      jawabanDetail.add({
+                                        'pertanyaan': soal.pertanyaan,
+                                        'jawabanUser':
+                                            selected != null
+                                                ? soal.opsiJawaban[selected]
+                                                : 'Kosong',
+                                        'jawabanBenar': soal.jawabanBenar,
+                                        'benar': isBenar,
+                                      });
+                                    }
 
-                            final userId =
-                                FirebaseAuth.instance.currentUser?.uid;
+                                    final userId =
+                                        FirebaseAuth.instance.currentUser?.uid;
 
-                            if (userId == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Data pendaftaran tidak ditemukan',
+                                    if (userId == null) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Data pendaftaran tidak ditemukan',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+
+                                    final namaSiswa = widget.siswa.nama;
+                                    print("Siswa data: $namaSiswa");
+                                    print("Siswa data: ${widget.siswa.nama}");
+
+                                    final hasilService = HasilTestService();
+                                    await hasilService.simpanHasilTest(
+                                      userId: userId,
+                                      namaSiswa: namaSiswa,
+                                      namaPelajaran:
+                                          widget.kategori.nama_pelajaran,
+                                      jawaban: jawabanDetail,
+                                      skor: hasilSkor,
+                                    );
+
+                                    setState(() {
+                                      isSubmit = false;
+                                    });
+
+                                    context.goNamed(
+                                      Routes.hasil_test,
+                                      extra: {
+                                        'selectedAnswers': selectedAnswers,
+                                        'soalList': soalList,
+                                        'skor': hasilSkor,
+                                        'siswa': widget.siswa,
+                                      },
+                                    );
+                                  },
+
+                          child:
+                              isSubmit
+                                  ? CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 4,
+                                  )
+                                  : Text(
+                                    'Submit',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
                                   ),
-                                ),
-                              );
-                              return;
-                            }
-
-                            final namaSiswa = widget.siswa.nama;
-                            print("Siswa data: $namaSiswa");
-                            print("Siswa data: ${widget.siswa.nama}");
-
-                            final hasilService = HasilTestService();
-                            await hasilService.simpanHasilTest(
-                              userId: userId,
-                              namaSiswa: namaSiswa,
-                              namaPelajaran: widget.kategori.nama_pelajaran,
-                              jawaban: jawabanDetail,
-                              skor: hasilSkor,
-                            );
-
-                            context.goNamed(
-                              Routes.hasil_test,
-                              extra: {
-                                'selectedAnswers': selectedAnswers,
-                                'soalList': soalList,
-                                'skor': hasilSkor,
-                                'siswa': widget.siswa,
-                              },
-                            );
-                          },
-
-                          child: const Text(
-                            'Submit',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
                         ),
                       ),
                     ],

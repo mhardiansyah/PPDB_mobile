@@ -7,7 +7,6 @@ class SoalService {
     'soal_test',
   );
 
-  // Fetch semua kategori soal
   Future<List<kategorisoalModel>> fetchKategoriSoal() async {
     try {
       final snapshot = await _firestore.collection('soal_test').get();

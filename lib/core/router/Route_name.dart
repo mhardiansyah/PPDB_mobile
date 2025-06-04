@@ -15,4 +15,5 @@ class Routes {
   static const String test_screen = '/test_screen';
   static const String hasil_test = '/hasil_test';
   static const String pembayaran = '/pembayaran';
+  static const String notFound = '/notFound';
 }

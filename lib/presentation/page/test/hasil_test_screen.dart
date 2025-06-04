@@ -24,34 +24,78 @@ class _HasilTestScreenState extends State<HasilTestScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Hasil Test',
-          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+        backgroundColor: const Color(0xFF278550),
+        elevation: 0,
+        title: Row(
           children: [
-            Row(
+            CircleAvatar(
+              backgroundColor: Colors.white,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(50),
+                child: Image.asset('assets/icons/logoBaru.png', width: 35),
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed:
-                      () => context.goNamed(Routes.daftar_test, extra: siswa),
-                ),
-                SizedBox(width: 10),
                 Text(
-                  'Skor Anda: $skor  / 100 ',
-                  style: const TextStyle(
-                    fontSize: 20,
+                  'SMK KREATIF NUSANTARA',
+                  style: TextStyle(
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
+                ),
+                Text(
+                  'Kab. Bogor',
+                  style: TextStyle(fontSize: 12, color: Colors.white),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+          ],
+        ),
+        leading: BackButton(
+          color: Colors.white,
+          onPressed: () {
+            context.goNamed(Routes.daftar_test, extra: siswa);
+          },
+        ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Section
+            Center(
+              child: Column(
+                children: [
+                  Text(
+                    'Selamat Anda Telah Mengerjakan Tes',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Skor Anda: $skor / 100',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            // List of Questions
             Expanded(
               child: ListView.builder(
                 itemCount: soalList.length,
@@ -62,66 +106,73 @@ class _HasilTestScreenState extends State<HasilTestScreen> {
                       userAnswer != null &&
                       soal.opsiJawaban[userAnswer] == soal.jawabanBenar;
 
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 4,
-                    ),
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${index + 1}. ${soal.pertanyaan}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Jawaban Anda: ${userAnswer != null ? soal.opsiJawaban[userAnswer] : 'Tidak dijawab'}',
-                            style: TextStyle(
-                              fontSize: 14,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Question Text
+                        Text(
+                          '${index + 1}. ${soal.pertanyaan}',
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 8),
+                        // Options
+                        ...List.generate(soal.opsiJawaban.length, (optIdx) {
+                          final isCorrect =
+                              soal.opsiJawaban[optIdx] == soal.jawabanBenar;
+                          final isSelected = userAnswer == optIdx;
+
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 4),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
                               color:
-                                  userAnswer != null
-                                      ? Colors.black
-                                      : Colors.grey,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Jawaban Benar: ${soal.jawabanBenar}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Icon(
-                                benar ? Icons.check_circle : Icons.cancel,
-                                color: benar ? Colors.green : Colors.red,
+                                  isSelected
+                                      ? (isCorrect
+                                          ? Colors.green.shade100
+                                          : Colors.red.shade100)
+                                      : null,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color:
+                                    isCorrect
+                                        ? Colors.green
+                                        : Colors.grey.shade300,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                benar ? 'Benar' : 'Salah',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: benar ? Colors.green : Colors.red,
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  isCorrect
+                                      ? Icons.check_circle
+                                      : (isSelected
+                                          ? Icons.cancel
+                                          : Icons.circle_outlined),
+                                  color: isCorrect ? Colors.green : Colors.red,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    soal.opsiJawaban[optIdx],
+                                    style: TextStyle(
+                                      color:
+                                          isCorrect
+                                              ? Colors.green
+                                              : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
                     ),
                   );
                 },

@@ -11,6 +11,7 @@ import 'package:ppdb_be/presentation/page/Home_screen.dart';
 import 'package:ppdb_be/presentation/page/Login_screen.dart';
 import 'package:ppdb_be/presentation/page/Register_screen.dart';
 import 'package:ppdb_be/presentation/page/edit_berkas_screen.dart';
+import 'package:ppdb_be/presentation/page/notFound_screen.dart';
 import 'package:ppdb_be/presentation/page/test/daftar_test_screen.dart';
 import 'package:ppdb_be/presentation/page/test/hasil_test_screen.dart';
 import 'package:ppdb_be/presentation/page/test/test_diniah_screen.dart';
@@ -130,5 +131,10 @@ final appRoute = [
       final siswa = state.extra as SiswaModel;
       return PembayaranScreen(siswa: siswa);
     },
+  ),
+  GoRoute(
+    path: '/notFound',
+    name: Routes.notFound,
+    builder: (context, state) => const NotfoundScreen(),
   ),
 ];

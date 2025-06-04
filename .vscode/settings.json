@@ -6,6 +6,7 @@
         "jumlah",
         "keterangan",
         "Kosong",
+        "Masuk",
         "metode",
         "opsi",
         "Pembayaran",
@@ -13,6 +14,7 @@
         "siswa",
         "Skor",
         "soal",
+        "Sudahbayar",
         "tanggal"
     ],
     "java.configuration.updateBuildConfiguration": "interactive"

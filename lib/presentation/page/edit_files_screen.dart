@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 import 'package:ppdb_be/core/models/berkas_model.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
@@ -46,6 +47,20 @@ class _EditFilesScreenState extends State<EditFilesScreen> {
 
   Future _kirimBerkas() async {
     setState(() => isLoading = true);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Lottie.asset(
+            'assets/animations/loadingPasir.json',
+            width: 200,
+            height: 200,
+            repeat: true,
+          ),
+        );
+      },
+    );
     for (int i = 0; i < selectedFiles.length; i++) {
       if (selectedFiles[i] != null) {
         try {

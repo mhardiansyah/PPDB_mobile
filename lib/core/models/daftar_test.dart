@@ -11,14 +11,7 @@ class SoalTest {
     this.kategoriId,
   });
 
-  // factory SoalTest.fromJson(Map<String, dynamic> json) {
-  //   return SoalTest(
-  //     jawabanBenar: json['jawabanBenar'] ?? '',
-  //     kategoriId: json['kategoriId'] as String?,
-  //     pertanyaan: json['pertanyaan'] ?? '',
-  //     opsiJawaban: List<String>.from(json['opsiJawaban'] ?? []),
-  //   );
-  // }
+
   factory SoalTest.fromMap(Map<String, dynamic> map) {
     return SoalTest(
       pertanyaan: map['judul'] ?? '',

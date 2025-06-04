@@ -44,7 +44,6 @@ class PendaftaranService {
     );
 
     try {
-      // Query dokumen berdasarkan berkas.siswaId
       final querySnapshot =
           await _pendaftaranCollection
               .where('berkas.siswaId', isEqualTo: siswaId)
@@ -56,10 +55,8 @@ class PendaftaranService {
         return;
       }
 
-      // Ambil ID dokumen
       final docId = querySnapshot.docs.first.id;
 
-      // Update field berkas
       await _pendaftaranCollection.doc(docId).update({
         'berkas.foto3x4Url': dataBerkas['foto3x4Url'],
         'berkas.ijazahUrl': dataBerkas['ijazahUrl'],

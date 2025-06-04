@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 import 'package:ppdb_be/core/models/pembayaran_model.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
@@ -12,6 +13,7 @@ import 'package:ppdb_be/service/pembayaran_uang_masuk_service.dart';
 import 'package:ppdb_be/utils/image_picker_mobile.dart';
 import 'package:ppdb_be/utils/image_picker_web.dart'
     if (dart.library.io) 'package:ppdb_be/utils/image_picker_mobile.dart';
+import 'package:ppdb_be/widgets/notif_succes.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:uuid/uuid.dart';
 
@@ -29,6 +31,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
   PembayaranModel? pembayaran;
   Uint8List? _buktiBayarBytes;
   final ImagePicker _picker = ImagePicker();
+  bool isLoading = false;
   // SiswaModel? siswa;
 
   @override
@@ -66,10 +69,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
 
   Future<void> _submitPembayaran() async {
     final siswaId = widget.siswa.id;
-    final isDiterima =
-        widget.siswa.status == 'accepted'; // Periksa status siswa
-    print("siswaId: $siswaId");
-    print("isDiterima: $isDiterima");
+    final isDiterima = widget.siswa.status == 'accepted';
 
     if (_buktiBayarBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -80,12 +80,28 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
       return;
     }
 
+    setState(() {
+      isLoading = true;
+    });
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Lottie.asset(
+            'assets/animations/loadingPasir.json',
+            width: 200,
+            height: 200,
+            repeat: true,
+          ),
+        );
+      },
+    );
+
     try {
-      // Pilih service berdasarkan nilai isDiterima
       final dynamic service =
-          isDiterima
-              ? PembayaranUangMasukService() // Gunakan service pembayaran uang masuk
-              : PembayaranService(); // Gunakan service pembayaran tes
+          isDiterima ? PembayaranUangMasukService() : PembayaranService();
 
       final buktiPembayaranUrl = await service.uploadBuktiPembayaran(
         _buktiBayarBytes!,
@@ -102,7 +118,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
         id: const Uuid().v4(),
         siswaId: siswaId ?? '',
         metodePembayaran: 'Transfer',
-        jumlah: isDiterima ? 4000000 : 250000, // Nominal berdasarkan status
+        jumlah: isDiterima ? 4000000 : 250000,
         buktiBayarBytes: _buktiBayarBytes,
       );
 
@@ -112,20 +128,25 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
           siswaId: siswaId ?? '',
           buktiPembayaranUrl: buktiPembayaranUrl,
           tanggalPembayaran: DateTime.now(),
-          status: isDiterima ? 'sudah bayar Uang masuk' : 'sudah bayar Uang tes',
+          status:
+              isDiterima ? 'sudah bayar Uang masuk' : 'sudah bayar Uang tes',
         );
       });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pembayaran berhasil ditambahkan')),
-      );
-      print("Pembayaran sebelum navigasi: $pembayaran");
-
-      context.goNamed(Routes.home);
     } catch (e) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Gagal tambah pembayaran: $e')));
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+
+      Navigator.of(context).pop();
+      showDialog(
+        context: context,
+        builder:
+            (context) => SuccessUploadDialog(schoolName: 'Pembayaran Berhasil'),
+      );
     }
   }
 
@@ -239,6 +260,9 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
                     ),
                   ),
                   const SizedBox(height: 100),
+                  if (isLoading) ...[
+                    Center(child: CircularProgressIndicator()),
+                  ],
                   Row(
                     children: [
                       Expanded(
@@ -254,26 +278,6 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
                           ),
                         ),
                       ),
-                      if (_buktiBayarBytes != null)
-                        Column(
-                          children: [
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Pratinjau Bukti Pembayaran:',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            const SizedBox(height: 10),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.memory(
-                                _buktiBayarBytes!,
-                                width: 100,
-                                height: 200,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ],
-                        ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(

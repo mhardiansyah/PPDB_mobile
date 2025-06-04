@@ -62,7 +62,7 @@ class PembayaranUangMasukService {
         siswaId: siswaId,
         buktiPembayaranUrl: buktiPembayaranUrl,
         tanggalPembayaran: DateTime.now(),
-        status: 'sudah bayar',
+        status: 'sudah bayar uang masuk',
       );
 
       await _pembayaranCollection.add(pembayaran.toJson());

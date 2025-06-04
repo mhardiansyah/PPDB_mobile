@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 import 'package:ppdb_be/core/models/daftar_test.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
@@ -99,7 +100,14 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
       ),
       body:
           _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? Center(
+                child: Lottie.asset(
+                  'assets/animations/loadingHome.json',
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              )
               : Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView.builder(

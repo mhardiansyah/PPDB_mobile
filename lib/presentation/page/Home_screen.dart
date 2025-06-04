@@ -115,6 +115,10 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         isSudahbayarUangMasuk = firstData?.status == 'sudah bayar uang masuk';
       });
+    } else {
+      setState(() {
+        isSudahbayarUangMasuk = false;
+      });
     }
   }
 
@@ -170,6 +174,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF278550),
@@ -185,21 +191,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Image.asset('assets/icons/logoBaru.png', width: 35),
                 ),
               ),
-              const SizedBox(width: 10),
-              const Column(
+              SizedBox(width: screenWidth * 0.02),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'SMK KREATIF NUSANTARA',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: screenWidth * 0.04,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                   Text(
                     'Kab. Bogor',
-                    style: TextStyle(fontSize: 12, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.03,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -224,9 +233,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     accountName: Text(user.displayName ?? 'User'),
                     accountEmail: Text(user.email ?? 'email'),
                     currentAccountPicture: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        user.photoURL ?? 'assets/icons/logoBaru.png',
-                      ),
+                      backgroundImage:
+                          user.photoURL != null
+                              ? NetworkImage(user.photoURL!)
+                              : Image.asset('assets/icons/logoBaru.png').image,
                     ),
                   );
                 } else {
@@ -253,7 +263,11 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: const Icon(Icons.text_snippet_outlined),
               title: const Text('Test'),
               onTap: () {
-                context.goNamed(Routes.daftar_test, extra: siswa);
+                if (siswa == null) {
+                  context.goNamed(Routes.notFound);
+                } else {
+                  context.goNamed(Routes.daftar_test, extra: siswa);
+                }
               },
             ),
             ListTile(
@@ -268,198 +282,212 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body:
           userId == null
-              ? Center(child: CircularProgressIndicator(color: Colors.green))
+              ? Center(
+                child: Lottie.asset(
+                  'assets/animations/loadingData.json',
+                  width: 100,
+                  height: 100,
+                  repeat: true,
+                ),
+              )
               : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 10,
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Image.asset(
-                          'assets/images/bgHome.png',
-                          fit: BoxFit.cover,
-                          width: MediaQuery.of(context).size.width * 1.5,
-                        ),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Image.asset(
+                        'assets/images/bgHome.png',
+                        fit: BoxFit.cover,
+                        width: MediaQuery.of(context).size.width * 1.5,
                       ),
-                      Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            buildWelcomeHeader(
-                              FirebaseAuth.instance.currentUser?.displayName ??
-                                  'User',
-                            ),
-
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20.0,
-                                vertical: 10,
-                              ),
-                              child: Text(
-                                'Selamat Datang di PPDB Online',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 10,
+                      ),
+                      child: Column(
+                        children: [
+                          Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                buildWelcomeHeader(
+                                  FirebaseAuth
+                                          .instance
+                                          .currentUser
+                                          ?.displayName ??
+                                      'User',
                                 ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                              ),
-                              child: StreamBuilder<List<SiswaModel>>(
-                                stream: PendaftaranService()
-                                    .getPendaftaranByUserId(userId!),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return Center(
-                                      child: CircularProgressIndicator.adaptive(
-                                        backgroundColor: Colors.green,
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation(
-                                          Colors.green,
-                                        ),
-                                      ),
-                                    );
-                                  }
 
-                                  if (!snapshot.hasData ||
-                                      snapshot.data!.isEmpty) {
-                                    return const Center(
-                                      child: Text(
-                                        "kamu belum mendaftar di PPDB ini",
-                                      ),
-                                    );
-                                  }
-
-                                  final siswaList = snapshot.data!;
-                                  return Column(
-                                    children:
-                                        siswaList
-                                            .map(
-                                              (siswa) =>
-                                                  buildSiswaContainer(siswa),
-                                            )
-                                            .toList(),
-                                  );
-                                },
-                              ),
-                            ),
-                            Center(
-                              child:
-                                  isSudahcomplete
-                                      ? Container(
-                                        width: 194,
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 24,
-                                          vertical: 8,
-                                        ),
-                                        margin: EdgeInsets.only(top: 40),
-                                        decoration: BoxDecoration(
-                                          color: Color(0xFF1B884B),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          border: Border.all(
-                                            color: Color(0xFFFFFFFF),
-                                            width: 2,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            "Pengumuman",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18,
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                      : null,
-                            ),
-
-                            const SizedBox(height: 20),
-                            Center(
-                              child:
-                                  isSudahcomplete
-                                      ? buildPengumumanContainer(context)
-                                      : null,
-                            ),
-                            const SizedBox(height: 20),
-
-                            Center(
-                              child: Container(
-                                width: 194,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF1B884B),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Color(0xFFFFFFFF),
-                                    width: 2,
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20.0,
+                                    vertical: 10,
                                   ),
-                                ),
-                                child: Center(
                                   child: Text(
-                                    "Fasilitas",
+                                    'Selamat Datang di PPDB Online',
                                     style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            GridView.count(
-                              crossAxisCount: 3,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              mainAxisSpacing: 10,
-                              crossAxisSpacing: 12,
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0,
+                                  ),
+                                  child: StreamBuilder<List<SiswaModel>>(
+                                    stream: PendaftaranService()
+                                        .getPendaftaranByUserId(userId!),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Center(
+                                          child: Lottie.asset(
+                                            'assets/animations/loadingData.json',
+                                            width: 100,
+                                            height: 100,
+                                            repeat: true,
+                                          ),
+                                        );
+                                      }
 
-                              children: [
-                                buildFeatureCard(
-                                  "Ekstrakurikuler Menarik & Beragam",
-                                  "assets/icons/eskul.png",
+                                      if (!snapshot.hasData ||
+                                          snapshot.data!.isEmpty) {
+                                        return const Center(
+                                          child: Text(
+                                            "kamu belum mendaftar di PPDB ini",
+                                          ),
+                                        );
+                                      }
+
+                                      final siswaList = snapshot.data!;
+                                      return Column(
+                                        children:
+                                            siswaList
+                                                .map(
+                                                  (siswa) =>
+                                                      buildSiswaContainer(
+                                                        siswa,
+                                                      ),
+                                                )
+                                                .toList(),
+                                      );
+                                    },
+                                  ),
                                 ),
-                                buildFeatureCard(
-                                  "Pesantren Berbasis IT",
-                                  "assets/icons/it.png",
+                                Center(
+                                  child:
+                                      isSudahcomplete
+                                          ? Container(
+                                            width: 194,
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 24,
+                                              vertical: 8,
+                                            ),
+                                            margin: EdgeInsets.only(top: 40),
+                                            decoration: BoxDecoration(
+                                              color: Color(0xFF1B884B),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              border: Border.all(
+                                                color: Color(0xFFFFFFFF),
+                                                width: 2,
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                "Pengumuman",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                          : null,
                                 ),
-                                buildFeatureCard(
-                                  "Program Keahlian Sesuai Kebutuhan Industri",
-                                  "assets/icons/program.png",
+
+                                const SizedBox(height: 20),
+                                Center(
+                                  child:
+                                      isSudahcomplete
+                                          ? buildPengumumanContainer(context)
+                                          : null,
                                 ),
-                                buildFeatureCard(
-                                  "Sertifikat Kompetensi",
-                                  "assets/icons/sertifikat.png",
+                                const SizedBox(height: 20),
+
+                                Center(
+                                  child: Container(
+                                    width: 194,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFF1B884B),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Color(0xFFFFFFFF),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Fasilitas",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                buildFeatureCard(
-                                  "Lingkungan asri",
-                                  "assets/icons/asri.png",
-                                ),
-                                buildFeatureCard(
-                                  "Dibimbing oleh Tenaga Pengajar Berpengalaman",
-                                  "assets/icons/pengajar.png",
+                                const SizedBox(height: 12),
+                                GridView.count(
+                                  crossAxisCount: 3,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  mainAxisSpacing: 10,
+                                  crossAxisSpacing: 12,
+
+                                  children: [
+                                    buildFeatureCard(
+                                      "Ekstrakurikuler Menarik & Beragam",
+                                      "assets/icons/eskul.png",
+                                    ),
+                                    buildFeatureCard(
+                                      "Pesantren Berbasis IT",
+                                      "assets/icons/it.png",
+                                    ),
+                                    buildFeatureCard(
+                                      "Program Keahlian Sesuai Kebutuhan Industri",
+                                      "assets/icons/program.png",
+                                    ),
+                                    buildFeatureCard(
+                                      "Sertifikat Kompetensi",
+                                      "assets/icons/sertifikat.png",
+                                    ),
+                                    buildFeatureCard(
+                                      "Lingkungan asri",
+                                      "assets/icons/asri.png",
+                                    ),
+                                    buildFeatureCard(
+                                      "Dibimbing oleh Tenaga Pengajar Berpengalaman",
+                                      "assets/icons/pengajar.png",
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -633,18 +661,26 @@ class _HomeScreenState extends State<HomeScreen> {
             String pesan4;
             Color warnabtn;
 
-            if (isDiterima) {
+            if (isSudahbayarUangMasuk) {
+              pesan1 =
+                  'Selamat, Anda sudah membayar uang masuk. Siswa dengan nama: ${siswa.nama} telah diterima di SMK KREATIF NUSANTARA.';
+              pesan2 =
+                  'Terima kasih telah mengikuti PPDB SMK KREATIF NUSANTARA.';
+              pesan3 = '';
+              pesan4 = 'DONE';
+              warnabtn = Color(0xFF278550);
+            } else if (isDiterima) {
               pesan1 =
                   'Berdasarkan hasil pemeriksaan Test, calon santri atas nama ${siswa.nama} dinyatakan';
               pesan2 = 'Lulus';
-              pesan3 = 'Silahkan untuk melanjutkan Pembayaran uang masuk';
+              pesan3 = 'Silahkan untuk melanjutkan pembayaran uang masuk.';
               pesan4 = 'Silahkan lanjutkan pembayaran';
               warnabtn = Color(0xFFFCAA09);
             } else if (isDitolak) {
               pesan1 =
                   'Berdasarkan hasil pemeriksaan Test, calon santri atas nama ${siswa.nama} dinyatakan';
               pesan2 = 'Tidak Lulus';
-              pesan3 = 'Silahkan untuk coba lagi di tahun depan';
+              pesan3 = 'Silahkan untuk coba lagi di tahun depan.';
               pesan4 = '';
               warnabtn = Color(0xFFFCAA09);
             } else if (!isSudahbayar) {
@@ -670,14 +706,6 @@ class _HomeScreenState extends State<HomeScreen> {
               pesan3 = 'Done';
               pesan4 = '';
               warnabtn = Color(0xFF278550);
-            } else if (isSudahbayarUangMasuk) {
-              pesan1 =
-                  'selamat anda sudah membayar uang masuk, siswa dengan nama: ${siswa.nama} telah diterima di SMK KREATIF NUSANTARA';
-              pesan2 =
-                  'Terima kasih telah mengikuti PPDB SMK KREATIF NUSANTARA';
-              pesan3 = 'Done';
-              pesan4 = '';
-              warnabtn = Color(0xFF278550);
             } else {
               pesan1 = 'Status pendaftaran tidak diketahui.';
               pesan2 = '';
@@ -698,6 +726,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 print("Status Pembayaran: ${pembayaran?.status}");
                 print("User ID: $userId");
                 print("Show Pembayaran: ${showPembayaranQr}");
+                print("Show Pembayaran Uang masuk: ${isSudahbayarUangMasuk}");
                 return Container(
                   width: 416,
                   margin: EdgeInsets.only(bottom: 20),
@@ -727,6 +756,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       SizedBox(height: 40),
+
                       if (isDiterima) ...[
                         Text(
                           pesan1,
@@ -761,27 +791,32 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
-                              onPressed: () {
-                                if (isDiterima) {
-                                  context.goNamed(
-                                    Routes.pembayaran,
-                                    extra: siswa,
-                                  );
-                                } else if (!isSudahbayar) {
-                                  context.goNamed(
-                                    Routes.pembayaran,
-                                    extra: siswa,
-                                  );
-                                } else if (isSudahbayar && !isSudahTest) {
-                                  context.goNamed(
-                                    Routes.daftar_test,
-                                    extra: siswa,
-                                  );
-                                } else if (isSudahbayar && isSudahTest) {
-                                  null;
-                                  print("ada masalah");
-                                }
-                              },
+                              onPressed:
+                                  isSudahbayarUangMasuk
+                                      ? null
+                                      : () {
+                                        if (isDiterima) {
+                                          context.goNamed(
+                                            Routes.pembayaran,
+                                            extra: siswa,
+                                          );
+                                        } else if (!isSudahbayar) {
+                                          context.goNamed(
+                                            Routes.pembayaran,
+                                            extra: siswa,
+                                          );
+                                        } else if (isSudahbayar &&
+                                            !isSudahTest) {
+                                          context.goNamed(
+                                            Routes.daftar_test,
+                                            extra: siswa,
+                                          );
+                                        } else if (isSudahbayar &&
+                                            isSudahTest) {
+                                          null;
+                                          print("ada masalah");
+                                        }
+                                      },
 
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: warnabtn,
