@@ -46,14 +46,13 @@ class _FormScreenState extends State<FormScreen> {
   initState() {
     User user = FirebaseAuth.instance.currentUser!;
     print("ID USER IS : ${user.uid}");
-    if (user != null) {
-      setState(() {
-        userId = user.uid;
-      });
-    }
-    super.initState();
+    setState(() {
+      userId = user.uid;
+    });
+      super.initState();
   }
 
+  @override
   void dispose() {
     namaSiswaController.dispose();
     asalSekolahController.dispose();

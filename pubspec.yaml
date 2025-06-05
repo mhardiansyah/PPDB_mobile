@@ -41,6 +41,11 @@ dependencies:
   google_sign_in: ^6.3.0
   http: ^1.4.0
   image_picker: ^1.1.2
+<<<<<<< HEAD
+=======
+  #  image_picker: ^1.0.7
+  image_picker_web: ^4.0.0
+>>>>>>> e378e4c (tes)
   lottie: ^3.3.1
   qr_flutter: ^4.1.0
   shared_preferences: ^2.5.3

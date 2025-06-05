@@ -7,7 +7,7 @@ import 'package:ppdb_be/service/soal_service.dart';
 
 class TestDiniahScreen extends StatefulWidget {
   final kategorisoalModel kategori;
-  const TestDiniahScreen({Key? key, required this.kategori}) : super(key: key);
+  const TestDiniahScreen({super.key, required this.kategori});
 
   @override
   State<TestDiniahScreen> createState() => _TestDiniahScreenState();

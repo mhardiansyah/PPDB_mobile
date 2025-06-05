@@ -82,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: togglePasswordVisibility,
                       ),
                     ),
+<<<<<<< HEAD
                   ),
                   const SizedBox(height: 20),
 
@@ -103,6 +104,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           'Login',
                           style: TextStyle(color: Colors.white, fontSize: 16),
+=======
+                    InkWell(
+                      onTap: () => context.goNamed(Routes.forgot_password),
+                      child: Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0x004d81e7),
+>>>>>>> e378e4c (tes)
                         ),
                       ),
                     ),

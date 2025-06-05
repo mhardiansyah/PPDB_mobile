@@ -2,13 +2,8 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:ppdb_be/core/models/berkas_model.dart';
-import 'package:ppdb_be/core/models/berkas_model.dart';
-import 'package:ppdb_be/core/models/pendaftaran.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
-import 'package:ppdb_be/core/router/App_router.dart';
-import 'package:ppdb_be/widgets/notif_succes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PendaftaranService {
@@ -39,13 +34,13 @@ class PendaftaranService {
     String siswaId,
     Map<String, dynamic> dataBerkas,
   ) async {
-    final _pendaftaranCollection = FirebaseFirestore.instance.collection(
+    final pendaftaranCollection = FirebaseFirestore.instance.collection(
       'pendaftaran',
     );
 
     try {
       final querySnapshot =
-          await _pendaftaranCollection
+          await pendaftaranCollection
               .where('berkas.siswaId', isEqualTo: siswaId)
               .limit(1)
               .get();
@@ -57,7 +52,12 @@ class PendaftaranService {
 
       final docId = querySnapshot.docs.first.id;
 
+<<<<<<< HEAD
       await _pendaftaranCollection.doc(docId).update({
+=======
+      // Update field berkas
+      await pendaftaranCollection.doc(docId).update({
+>>>>>>> e378e4c (tes)
         'berkas.foto3x4Url': dataBerkas['foto3x4Url'],
         'berkas.ijazahUrl': dataBerkas['ijazahUrl'],
         'berkas.kartuKeluargaUrl': dataBerkas['kartuKeluargaUrl'],

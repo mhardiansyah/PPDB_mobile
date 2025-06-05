@@ -3,18 +3,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
 import 'package:ppdb_be/core/models/pembayaran_model.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
 import 'package:ppdb_be/service/Pendaftaran_service.dart';
 import 'package:ppdb_be/service/auth_service.dart';
 import 'package:ppdb_be/service/pembayaran_service.dart';
+<<<<<<< HEAD
 import 'package:ppdb_be/service/pembayaran_uang_masuk_service.dart';
 import 'package:ppdb_be/widgets/SiswaCard.dart';
 import 'package:ppdb_be/widgets/berkas.dart';
 import 'package:ppdb_be/widgets/notif_failed.dart';
 import 'package:ppdb_be/widgets/notif_succes.dart';
+=======
+>>>>>>> e378e4c (tes)
 import 'package:qr_flutter/qr_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -139,7 +141,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void cekDiterima(String userId) async {
     final stream = PendaftaranService().getPendaftaranByUserId(userId);
     stream.listen((siswaList) {
+<<<<<<< HEAD
       if (mounted) {
+=======
+      if (siswaList.isNotEmpty) {
+        final siswa = siswaList.first;
+        print("Status Siswa: ${siswa.status}");
+        print("Siswa: $siswa");
+
+>>>>>>> e378e4c (tes)
         setState(() {
           if (siswaList.isNotEmpty) {
             final siswa = siswaList.first;
@@ -725,6 +735,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 final pembayaran = pembayaranSnapshot.data;
                 print("Status Pembayaran: ${pembayaran?.status}");
                 print("User ID: $userId");
+<<<<<<< HEAD
                 print("Show Pembayaran: ${showPembayaranQr}");
                 print("Show Pembayaran Uang masuk: ${isSudahbayarUangMasuk}");
                 return Container(
@@ -739,6 +750,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.black.withOpacity(0.1),
                         blurRadius: 6,
                         offset: Offset(0, 3),
+=======
+                print("Show Pembayaran: $showPembayaranQr");
+
+                return showPembayaranQr
+                    ? Container(
+                      width: 416,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF278550),
+                        borderRadius: BorderRadius.circular(20),
+>>>>>>> e378e4c (tes)
                       ),
                     ],
                   ),

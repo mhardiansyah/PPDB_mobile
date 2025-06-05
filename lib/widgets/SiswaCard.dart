@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
@@ -6,7 +5,7 @@ import 'package:ppdb_be/core/models/siswa_model.dart';
 class SiswaCard extends StatelessWidget {
   final SiswaModel siswa;
 
-  const SiswaCard({Key? key, required this.siswa}) : super(key: key);
+  const SiswaCard({super.key, required this.siswa});
 
   @override
   Widget build(BuildContext context) {

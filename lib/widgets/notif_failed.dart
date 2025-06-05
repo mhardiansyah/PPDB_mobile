@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
@@ -42,7 +41,7 @@ class NotifFailed extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 25),
-          Container(
+          SizedBox(
             width: 172,
             child: ElevatedButton(
               onPressed: () => context.goNamed(Routes.home),

@@ -42,7 +42,7 @@ class SuccessUploadDialog extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 25),
-          Container(
+          SizedBox(
             width: 172,
             child: ElevatedButton(
               onPressed: () => context.goNamed(Routes.home),

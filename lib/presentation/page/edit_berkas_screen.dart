@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
@@ -69,14 +68,13 @@ class _EditBerkasScreenState extends State<EditBerkasScreen> {
     getData();
     User user = FirebaseAuth.instance.currentUser!;
     print("ID USER IS : ${user.uid}");
-    if (user != null) {
-      setState(() {
-        userId = user.uid;
-      });
-    }
-    super.initState();
+    setState(() {
+      userId = user.uid;
+    });
+      super.initState();
   }
 
+  @override
   void dispose() {
     namaSiswaController.dispose();
     asalSekolahController.dispose();

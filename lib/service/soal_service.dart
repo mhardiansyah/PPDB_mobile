@@ -14,7 +14,7 @@ class SoalService {
       List<kategorisoalModel> kategoriList = [];
 
       for (var doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
 
         data['nama_pelajaran'] ??= doc.id;
 

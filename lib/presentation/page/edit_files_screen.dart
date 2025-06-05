@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import 'dart:typed_data';
+=======
+
+>>>>>>> e378e4c (tes)
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,7 +22,7 @@ import 'package:ppdb_be/widgets/notif_succes.dart';
 class EditFilesScreen extends StatefulWidget {
   SiswaModel? siswa;
 
-  EditFilesScreen({Key? key, this.siswa}) : super(key: key);
+  EditFilesScreen({super.key, this.siswa});
 
   @override
   State<EditFilesScreen> createState() => _EditFilesScreenState();

@@ -1,9 +1,12 @@
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+<<<<<<< HEAD
 import 'package:lottie/lottie.dart';
+=======
+import 'package:image_picker_web/image_picker_web.dart';
+>>>>>>> e378e4c (tes)
 import 'package:ppdb_be/core/models/pembayaran_model.dart';
 import 'package:ppdb_be/core/models/siswa_model.dart';
 import 'package:ppdb_be/core/router/App_router.dart';
@@ -38,12 +41,8 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
   void initState() {
     super.initState();
     SiswaModel siswa = widget.siswa;
-    if (siswa != null) {
-      print("Siswa ID: ${siswa.id}");
-    } else {
-      print("Siswa data is null");
+    print("Siswa ID: ${siswa.id}");
     }
-  }
 
   Future<void> _pickImage() async {
     Uint8List? imageBytes;
