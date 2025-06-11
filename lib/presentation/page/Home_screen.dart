@@ -418,68 +418,69 @@ class _HomeScreenState extends State<HomeScreen> {
                                           : null,
                                 ),
                                 const SizedBox(height: 20),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 10,
+                                  ),
 
-                                Center(
-                                  child: Container(
-                                    width: 194,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 24,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFF1B884B),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: Color(0xFFFFFFFF),
-                                        width: 2,
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        "Fasilitas",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
+                                  height: 300,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFF278550),
+                                    border: Border.all(color: Colors.white),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+
+                                  child: Column(
+                                    children: [
+                                      Center(
+                                        child: Text(
+                                          "Fasilitas",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                GridView.count(
-                                  crossAxisCount: 3,
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  mainAxisSpacing: 10,
-                                  crossAxisSpacing: 12,
+                                      const SizedBox(height: 12),
+                                      GridView.count(
+                                        crossAxisCount: 3,
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        mainAxisSpacing: 8,
+                                        crossAxisSpacing: 2,
 
-                                  children: [
-                                    buildFeatureCard(
-                                      "Ekstrakurikuler Menarik & Beragam",
-                                      "assets/icons/eskul.png",
-                                    ),
-                                    buildFeatureCard(
-                                      "Pesantren Berbasis IT",
-                                      "assets/icons/it.png",
-                                    ),
-                                    buildFeatureCard(
-                                      "Program Keahlian Sesuai Kebutuhan Industri",
-                                      "assets/icons/program.png",
-                                    ),
-                                    buildFeatureCard(
-                                      "Sertifikat Kompetensi",
-                                      "assets/icons/sertifikat.png",
-                                    ),
-                                    buildFeatureCard(
-                                      "Lingkungan asri",
-                                      "assets/icons/asri.png",
-                                    ),
-                                    buildFeatureCard(
-                                      "Dibimbing oleh Tenaga Pengajar Berpengalaman",
-                                      "assets/icons/pengajar.png",
-                                    ),
-                                  ],
+                                        children: [
+                                          buildFeatureCard(
+                                            "Ekstrakurikuler Menarik & Beragam",
+                                            "assets/icons/eskul.png",
+                                          ),
+                                          buildFeatureCard(
+                                            "Pesantren Berbasis IT",
+                                            "assets/icons/it.png",
+                                          ),
+                                          buildFeatureCard(
+                                            "Program Keahlian Sesuai Kebutuhan Industri",
+                                            "assets/icons/program.png",
+                                          ),
+                                          buildFeatureCard(
+                                            "Sertifikat Kompetensi",
+                                            "assets/icons/sertifikat.png",
+                                          ),
+                                          buildFeatureCard(
+                                            "Lingkungan asri",
+                                            "assets/icons/asri.png",
+                                          ),
+                                          buildFeatureCard(
+                                            "Dibimbing oleh Tenaga Pengajar Berpengalaman",
+                                            "assets/icons/pengajar.png",
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -996,20 +997,33 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "DATA ANAK",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "DATA SISWA",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
-          _buildDetail("Nama", siswa.nama ?? "-"),
-          _buildDetail("Jurusan", siswa.jurusan ?? "-"),
-          _buildDetail("Asal Sekolah", siswa.asalSekolah ?? "-"),
-          _buildDetail("Jenis Kelamin", siswa.jenisKelamin ?? "-"),
-          _buildDetail("Domisili", siswa.domisili ?? "-"),
+          _buildDetailWithIcon(Icons.person, "Nama", siswa.nama ?? "-"),
+          _buildDetailWithIcon(Icons.school, "Jurusan", siswa.jurusan ?? "-"),
+          _buildDetailWithIcon(
+            Icons.business,
+            "Asal Sekolah",
+            siswa.asalSekolah ?? "-",
+          ),
+          _buildDetailWithIcon(
+            Icons.male,
+            "Jenis Kelamin",
+            siswa.jenisKelamin ?? "-",
+          ),
+          _buildDetailWithIcon(Icons.home, "Domisili", siswa.domisili ?? "-"),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1036,7 +1050,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              const SizedBox(width: 10),
               ElevatedButton(
                 onPressed:
                     isSudahcomplete
@@ -1049,18 +1062,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       isSudahcomplete ? Color(0xFF278550) : Color(0xFFFCAA09),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
-                    side: BorderSide(
-                      color:
-                          isSudahcomplete
-                              ? Color(0xFFFFFFFF)
-                              : Color(0xFFFCAA09),
-                      width: 2,
-                    ),
                   ),
                 ),
                 child: Text(
-                  isSudahcomplete ? "Sudah Complete" : "Lengkapi Berkas",
-                  style: GoogleFonts.poppins(
+                  isSudahcomplete ? "Sudah Complete" : "Belum upload berkas",
+                  style: TextStyle(
                     fontSize: 12,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -1099,11 +1105,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildDetail(String title, String value) {
+  Widget _buildDetailWithIcon(IconData icon, String title, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
+          Icon(icon, color: Colors.white, size: 16),
+          const SizedBox(width: 8),
           Expanded(
             flex: 3,
             child: Text("$title:", style: TextStyle(color: Colors.white)),

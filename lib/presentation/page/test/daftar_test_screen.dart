@@ -25,6 +25,7 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
   bool _isLoading = true;
   String? userId;
   SiswaModel? siswa;
+  bool showSudahSelesai = false;
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
     final user = FirebaseAuth.instance.currentUser;
     print("User ID: ${user?.uid}");
     print("User ID: ${FirebaseAuth.instance.currentUser?.uid}");
+
     siswa = widget.siswa;
     if (user != null) {
       userId = user.uid;
@@ -110,141 +112,219 @@ class _DaftarTestScreenState extends State<DaftarTestScreen> {
               )
               : Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: ListView.builder(
-                  itemCount: _kategoriSoalList.length,
-                  itemBuilder: (context, index) {
-                    final item = _kategoriSoalList[index];
-                    final sudahDikerjakan = sudahDikerjakanList.contains(
-                      item.nama_pelajaran,
-                    );
-
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(12),
-                            ),
-                            child: Image.network(
-                              item.image_url,
-                              width: double.infinity,
-                              height: 130,
-                              fit: BoxFit.cover,
-                              errorBuilder:
-                                  (context, error, stackTrace) => Image.asset(
-                                    'assets/images/default_gambar.png',
-                                    width: double.infinity,
-                                    height: 130,
-                                    fit: BoxFit.cover,
-                                  ),
-                            ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FilterChip(
+                          label: const Text("Belum selesai"),
+                          selected: !showSudahSelesai,
+                          selectedColor: const Color(0xFF278550),
+                          checkmarkColor: Colors.white,
+                          labelStyle: TextStyle(
+                            color:
+                                !showSudahSelesai ? Colors.white : Colors.black,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.nama_pelajaran,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  item.deskripsi,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: const [
-                                        Icon(Icons.access_time, size: 16),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          "2 Jam",
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                      ],
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            sudahDikerjakan
-                                                ? Colors.grey
-                                                : const Color(0xFF278550),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 20,
-                                          vertical: 8,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                      ),
-                                      // onPressed:
-                                      //     (sudahDikerjakan || siswa == null)
-                                      //         ? null
-                                      //         : () {
-                                      //           print(
-                                      //             "Navigating with siswa: $siswa",
-                                      //           );
-                                      //           context.goNamed(
-                                      //             Routes.test_screen,
-                                      //             extra: {
-                                      //               'item': item,
-                                      //               'siswa': siswa,
-                                      //             },
-                                      //           );
-                                      //         },
-                                      onPressed:
-                                          sudahDikerjakan
-                                              ? null
-                                              : () {
-                                                context.goNamed(
-                                                  Routes.test_screen,
-                                                  extra: {
-                                                    'item': item,
-                                                    'siswa': siswa,
-                                                  },
-                                                );
-                                              },
+                          onSelected: (_) {
+                            setState(() {
+                              showSudahSelesai = false;
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 10),
+                        FilterChip(
+                          label: const Text("Sudah selesai"),
+                          selected: showSudahSelesai,
+                          selectedColor: const Color(0xFF278550),
+                          checkmarkColor: Colors.white,
+                          labelStyle: TextStyle(
+                            color:
+                                showSudahSelesai ? Colors.white : Colors.black,
+                          ),
+                          onSelected: (_) {
+                            setState(() {
+                              showSudahSelesai = true;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
 
-                                      child: Text(
-                                        sudahDikerjakan
-                                            ? "Sudah dikerjakan"
-                                            : "Mulai tes",
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _kategoriSoalList.length,
+                        itemBuilder: (context, index) {
+                          final item = _kategoriSoalList[index];
+                          print("Deskripsi: ${item.deskripsi}");
+                          final sudahDikerjakan = sudahDikerjakanList.contains(
+                            item.nama_pelajaran,
+                          );
+
+                          if (showSudahSelesai && !sudahDikerjakan)
+                            return const SizedBox();
+                          if (!showSudahSelesai && sudahDikerjakan)
+                            return const SizedBox();
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  spreadRadius: 2,
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 3),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.horizontal(
+                                    left: Radius.circular(5),
+                                    right: Radius.circular(5),
+                                  ),
+                                  child: Image.network(
+                                    item.image_url,
+                                    width: 120,
+                                    height: 190,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (
+                                          context,
+                                          error,
+                                          stackTrace,
+                                        ) => Image.asset(
+                                          'assets/images/default_gambar.png',
+                                          width: 120,
+                                          height: 120,
+                                          fit: BoxFit.cover,
+                                        ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.nama_pelajaran,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          item.deskripsi,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black87,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+
+                                        const SizedBox(height: 12),
+                                        Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.access_time,
+                                                  size: 16,
+                                                  color: Colors.grey,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  "120 Menit",
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.list_alt,
+                                                  size: 16,
+                                                  color: Colors.grey,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  "Jumlah: 25 Soal",
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 12),
+                                        SizedBox(
+                                          width: double.infinity,
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  sudahDikerjakan
+                                                      ? Colors.grey
+                                                      : const Color(0xFF278550),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 8,
+                                                  ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              elevation: 0,
+                                            ),
+                                            onPressed:
+                                                sudahDikerjakan
+                                                    ? null
+                                                    : () {
+                                                      context.goNamed(
+                                                        Routes.test_screen,
+                                                        extra: {
+                                                          'item': item,
+                                                          'siswa': siswa,
+                                                        },
+                                                      );
+                                                    },
+                                            child: Text(
+                                              sudahDikerjakan
+                                                  ? "Sudah dikerjakan"
+                                                  : "Mulai tes",
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ),
     );

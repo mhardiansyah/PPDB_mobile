@@ -11,7 +11,6 @@ class SoalTest {
     this.kategoriId,
   });
 
-
   factory SoalTest.fromMap(Map<String, dynamic> map) {
     return SoalTest(
       pertanyaan: map['judul'] ?? '',
@@ -46,7 +45,7 @@ class kategorisoalModel {
   kategorisoalModel({
     required this.nama_pelajaran,
     this.userid,
-    required this.deskripsi,
+    this.deskripsi = '',
     this.image_url = '',
   });
 
