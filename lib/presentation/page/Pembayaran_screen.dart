@@ -255,7 +255,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
                   Center(
                     child: QrImageView(
                       data: "589678267365",
-                      size: 150,
+                      size: 250,
                       backgroundColor: Colors.white,
                     ),
                   ),
