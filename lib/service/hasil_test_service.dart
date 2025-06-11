@@ -70,5 +70,14 @@ class HasilTestService {
       return null;
     }
   }
+
+  Future<bool> hasTestData(String userId) async {
+    final result = await _firestore
+        .collection('hasil_test')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    return result.docs.isNotEmpty;
+  }
   
 }

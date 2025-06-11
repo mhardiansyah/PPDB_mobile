@@ -36,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isDiterima = false;
   bool isDitolak = false;
   bool showPembayaranQr = false;
-
   SiswaModel? siswa;
   @override
   void initState() {
@@ -259,17 +258,17 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Pengaturan'),
               onTap: () {},
             ),
-            ListTile(
-              leading: const Icon(Icons.text_snippet_outlined),
-              title: const Text('Test'),
-              onTap: () {
-                if (siswa == null) {
-                  context.goNamed(Routes.notFound);
-                } else {
-                  context.goNamed(Routes.daftar_test, extra: siswa);
-                }
-              },
-            ),
+            // ListTile(
+            //   leading: const Icon(Icons.text_snippet_outlined),
+            //   title: const Text('Test'),
+            //   onTap: () {
+            //     if (siswa == null) {
+            //       context.goNamed(Routes.notFound);
+            //     } else {
+            //       context.goNamed(Routes.daftar_test, extra: siswa);
+            //     }
+            //   },
+            // ),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Keluar'),
