@@ -450,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         physics:
                                             const NeverScrollableScrollPhysics(),
                                         mainAxisSpacing: 8,
-                                        crossAxisSpacing: 2,
+                                        crossAxisSpacing: 4,
 
                                         children: [
                                           buildFeatureCard(
@@ -1096,7 +1096,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 7),
             Text(
               title,
-              style: TextStyle(fontSize: 10, color: Colors.indigo[900]),
+              style: TextStyle(fontSize: 9, color: Colors.indigo[900]),
               textAlign: TextAlign.center,
             ),
           ],
