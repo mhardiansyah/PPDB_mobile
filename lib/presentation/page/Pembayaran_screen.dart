@@ -206,20 +206,22 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF168038),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
+
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF168038),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                "Pembayaran",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              onPressed: () {},
-              child: const Text(
-                "Pembayaran",
-                style: TextStyle(color: Colors.white),
-              ),
             ),
+
             const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.all(20),
