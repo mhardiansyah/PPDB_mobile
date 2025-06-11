@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       context.goNamed(Routes.register);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: Colors.orange,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),

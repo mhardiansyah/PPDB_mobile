@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ppdb_be/core/router/App_router.dart';
 import 'package:ppdb_be/service/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -161,7 +163,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        context.goNamed(Routes.login);
                       },
                       child: Text(
                         'Log In',
